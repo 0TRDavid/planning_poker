@@ -1,0 +1,22 @@
+services:
+  backend:
+    build: ./backend
+    container_name: django_dash
+    restart: always
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./backend/.env
+
+
+  frontend:
+    build: ./frontend
+    container_name: react_dash
+    restart: always
+    ports:
+      - "5171:5171"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+
