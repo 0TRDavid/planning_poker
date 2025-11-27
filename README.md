@@ -14,7 +14,7 @@ Windows
 ```
 cd backend
 python -m venv env
-env/script/acivate
+env/Script/activate
 pip install -r requirements.txt
 python manage.py runserver
 ```
