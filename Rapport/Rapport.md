@@ -5,8 +5,9 @@ Comparaison biblio back end :
 choix front : react.js
 
 
-## Enregistrer un utilisateur et rediriger vers sa page perso
+## Enregistrer un utilisateur dans un cookie
 
 ## Définir le format du json
+
 
 ## Importer les userstory du json et les afficher
