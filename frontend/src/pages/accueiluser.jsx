@@ -18,18 +18,15 @@ import {
   CircularProgress
 } from '@mui/material';
 
-// Mock API fonction (à remplacer par votre backend réel)
-const mockFetchSessions = () =>
-  new Promise(resolve =>
-    setTimeout(
-      () =>
-        resolve([
-          { id: 'ABC123', name: 'Sprint Planning', status: 'open', stories: 12 },
-          { id: 'XYZ789', name: 'Refinement', status: 'in-progress', stories: 5 },
-        ]),
-      600
-    )
-  );
+
+
+//API qui va appeler les sessions existantes dans le back
+const fetchSessions = async () => {
+  const response = await fetch('http://localhost:8000/api/sessions/'); // URL de votre API Django
+  const sessions = await response.json();
+  console.log(sessions);
+  return sessions;
+};
 
 export default function AccueilUser() {
   const [sessions, setSessions] = useState([]);
@@ -40,7 +37,7 @@ export default function AccueilUser() {
   const loadSessions = async () => {
     setLoading(true);
     try {
-      const data = await mockFetchSessions();
+      const data = await fetchSessions();  // On appel la fonction de récupération des sessions
       setSessions(data);
     } finally {
       setLoading(false);
@@ -68,6 +65,7 @@ export default function AccueilUser() {
   };
 
   return (
+    
     <Container maxWidth="md" sx={{ py: 6 }}>
       <Stack spacing={4}>
         <Box>
@@ -142,15 +140,15 @@ export default function AccueilUser() {
             )}
             <Stack spacing={2}>
               {sessions.map(s => (
-                <Card key={s.id} variant="outlined" sx={{ borderRadius: 2 }}>
+                <Card key={s.id_session} variant="outlined" sx={{ borderRadius: 2 }}>
                   <CardContent>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                       <Box>
                         <Typography variant="subtitle1" fontWeight={600}>
-                          {s.name}
+                          {s.titre}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Code: {s.id}
+                          Code: {s.id_session}
                         </Typography>
                       </Box>
                       <Chip
@@ -171,18 +169,28 @@ export default function AccueilUser() {
                         }
                       />
                     </Stack>
-                    <Typography variant="body2" mt={1} color="text.secondary">
-                      Stories: {s.stories}
-                    </Typography>
+
+                    {/* Affichage de la liste des stories */}
+                    <Stack spacing={1} mt={2}>
+                      {s.stories.map((story, index) => (
+                        <Box key={story.titre + index} sx={{ border: '1px solid #ccc', p: 1, borderRadius: 1 }}>
+                          <Typography variant="subtitle2" fontWeight={500}>
+                            {story.titre}
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            {story.contenu}
+                          </Typography>
+                          <Typography variant="caption" color="text.secondary">
+                            Valeur: {story.valeur}
+                          </Typography>
+                        </Box>
+                      ))}
+                    </Stack>
                   </CardContent>
-                  <CardActions sx={{ pt: 0 }}>
-                    <Button size="small" onClick={() => alert('Entrer ' + s.id)}>
-                      Entrer
-                    </Button>
-                  </CardActions>
                 </Card>
               ))}
             </Stack>
+
           </CardContent>
         </Card>
       </Stack>

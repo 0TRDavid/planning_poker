@@ -29,6 +29,10 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",  # Remplacez par l’URL de votre frontend
+]
+
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -37,6 +41,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'planning_poker',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -47,6 +54,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
 ]
 
 ROOT_URLCONF = 'backend.urls'
