@@ -3,7 +3,7 @@ import './assets/App.css'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from "./layout/header";
 import Accueil from './pages/accueil.jsx'
-import AccueilUser from './pages/accueiluser.jsx'
+import AccueilUser from './pages/accueil_user.jsx'
 
 
 function App() {

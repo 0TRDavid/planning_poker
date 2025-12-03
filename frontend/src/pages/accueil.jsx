@@ -31,8 +31,6 @@ const Accueil = () => {
 
     return (
         <Container maxWidth="sm" className="accueil-container">
-            {/* J'ai supprimé la div 'accueil-center' et appliqué ses propriétés de centrage
-                directement à 'accueil-container' pour simplifier le JSX. */}
             <Paper elevation={8} className="accueil-card">
                 <Typography variant="h4" component="h1" className="accueil-title">
                     Planning Poker

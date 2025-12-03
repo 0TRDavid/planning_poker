@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-    Box, Container, Typography, Stack, Button, TextField, 
-    Card, CardContent, Divider, CircularProgress, Chip 
-} from '@mui/material';
+import {Box, Container, Typography, Stack, Button, TextField, Card, CardContent, Divider, CircularProgress, Chip} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
@@ -13,19 +10,19 @@ import { fetchSessions, createSession } from '../services/api'; // Ajustez le ch
 // --- STYLES (Utilisation de l'approche SX de MUI pour la cohésion) ---
 const componentStyles = {
     headerBox: {
-        mb: 3 
+        mb: 4
     },
     refreshButton: {
-        display: { xs: 'none', sm: 'inline-flex' } // Masquer le texte sur mobile si nécessaire
+        display: { xs: 'none', sm: 'inline-flex' }
     },
     sessionCard: {
-        borderRadius: 2, 
+        borderRadius: 3, 
         '&:hover': { 
-            boxShadow: 3 // Légère ombre au survol
+            boxShadow: 3 
         }
     },
     storyBox: {
-        border: '1px solid',
+        border: '2px solid',
         borderColor: 'grey.300',
         p: 1,
         borderRadius: 1
@@ -56,7 +53,6 @@ export default function AccueilUser() {
 
   const handleJoin = () => {
     if (!joinCode.trim()) return;
-    // Ici, vous feriez l'appel à joinSession(joinCode)
     alert('Join session: ' + joinCode);
     setJoinCode('');
   };
