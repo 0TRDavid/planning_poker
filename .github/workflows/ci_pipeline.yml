@@ -21,8 +21,8 @@ jobs:
       
       - name : Install Docker Compose
         run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose-plugin
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install -y docker-compose
 
       - name: Build and Start ONLY Backend Service
         run: docker-compose up --build -d backend
