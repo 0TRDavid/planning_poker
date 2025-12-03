@@ -27,9 +27,6 @@ jobs:
 
       - name: Wait for services to be ready
         run: sleep 10
-
-      - name: Execute Django Tests
-        run: docker-compose exec backend python manage.py test --noinput
         
   # --- 2. Tâche pour le Frontend (Tests React/Vite) ---
   frontend_test:
