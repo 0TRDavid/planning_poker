@@ -44,3 +44,7 @@ jobs:
       - name: Install Frontend Dependencies
         run: npm install
         working-directory: ./frontend 
+
+      - name: Run Frontend Tests (Jest/Vitest)
+        run: npm run test -- --watchAll=false
+        working-directory: ./frontend
