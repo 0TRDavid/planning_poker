@@ -5,13 +5,10 @@ import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 // Importation des fonctions API
-import { fetchSessions, createSession } from '../services/api'; // Ajustez le chemin
+import { fetchSessions } from '../services/api';
 
 // --- STYLES (Utilisation de l'approche SX de MUI pour la cohésion) ---
 const componentStyles = {
-    headerBox: {
-        mb: 4
-    },
     refreshButton: {
         display: { xs: 'none', sm: 'inline-flex' }
     },
@@ -40,7 +37,7 @@ export default function AccueilUser() {
   const loadSessions = async () => {
     setLoading(true);
     try {
-      const data = await fetchSessions();  // Appel via le fichier API
+      const data = await fetchSessions();
       setSessions(data);
     } finally {
       setLoading(false);
@@ -60,13 +57,9 @@ export default function AccueilUser() {
   const handleCreate = async () => {
     setCreating(true);
     try {
-        await createSession(); // Appel via le fichier API
-        alert('Session créée');
-        loadSessions(); // Recharger la liste après création
+        window.location.href = '/create-session';
     } catch (e) {
         alert("Erreur lors de la création.");
-    } finally {
-        setCreating(false);
     }
   };
   

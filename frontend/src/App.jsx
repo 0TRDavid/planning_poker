@@ -4,6 +4,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Header from "./layout/header";
 import Accueil from './pages/accueil.jsx'
 import AccueilUser from './pages/accueil_user.jsx'
+import Creation_session from './pages/creation_session.jsx'
+import GameSession from './pages/partie.jsx';
 
 
 function App() {
@@ -14,8 +16,9 @@ function App() {
       <Header />
       <Routes>
         <Route path="/" element={<Accueil />} />
-        <Route path="/accueil" element={<Accueil />} />
         <Route path="/accueiluser" element={<AccueilUser />} />
+        <Route path="/create-session" element={<Creation_session />} />
+        <Route path="/partie/:id_session" element={<GameSession />} />
 
       </Routes>
     </BrowserRouter>

@@ -8,7 +8,7 @@ class Session(models.Model):
 
     id_session = models.CharField(max_length=6, unique=True, editable=False, default=generate_six_digit_code)
     titre = models.CharField(max_length=255)
-    stories = models.JSONField()  # Utilisez ici django.db.models.JSONField
+    stories = models.JSONField()
 
     def __str__(self):
         return f"{self.titre} ({self.id_session})"
