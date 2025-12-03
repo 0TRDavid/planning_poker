@@ -1,0 +1,50 @@
+# .github/workflows/ci_pipeline.yml
+
+name: CI Pipeline (Django & React)
+
+# Déclencheur
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  
+# --- JOBS (Tâches) ---
+jobs:
+  # 1. Tâche pour le Backend (Tests Django avec Docker Compose)
+  backend_test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Build and Start ONLY Backend Service
+        run: docker-compose up --build -d backend
+
+      - name: Wait for services to be ready
+        run: sleep 10
+
+      - name: Execute Django Tests
+        run: docker-compose exec backend python manage.py test --noinput
+        
+  # --- 2. Tâche pour le Frontend (Tests React/Vite) ---
+  frontend_test:
+    needs: backend_test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' 
+
+      - name: Install Frontend Dependencies
+        run: npm install
+        working-directory: ./frontend 
+
+      - name: Run Frontend Tests (Jest/Vitest)
+        run: npm run test -- --watchAll=false
+        working-directory: ./frontend
