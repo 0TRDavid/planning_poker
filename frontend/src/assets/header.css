@@ -1,0 +1,88 @@
+/* header3.css */
+.navbar {
+  position: fixed; /* Fixe la navbar en haut */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1100;
+  background-color: #fff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre subtile pour la profondeur */
+  padding: 0px 20px;
+  transition: background-color 0.3s ease; /* Transition douce pour le changement de couleur */
+  animation: slideIn 1s ease-in-out; /* Animation de slide-in */
+}
+
+/* Nouvelle classe englobante pour aligner gauche et droite */
+.navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Animation d'apparition */
+@keyframes slideIn {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Style pour le logo et le titre principal */
+.navbar-brand {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #333;
+  transition: color 0.3s ease; /* Transition douce pour la couleur */
+}
+
+.navbar-brand:hover {
+  color: #007bff; /* Changement de couleur au survol */
+}
+
+/* Style pour le sous-titre (bloc droit) */
+.navbar-brand2 {
+  font-size: 1rem;
+  font-style: normal;
+  color: #333;
+  margin-top: 10px;
+  margin-right: 50px;
+  transition: color 0.3s ease;
+  text-decoration: none !important;
+  color: inherit;
+}
+
+/* Styles généraux pour les éléments Nav */
+.navbar-nav {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-nav .nav-link {
+  font-size: 1.2rem;
+  color: #333;
+  margin-right: 20px;
+  text-decoration: none;
+  transition: transform 0.3s ease, color 0.3s ease; /* Animation au survol */
+}
+
+.navbar-nav .nav-link:hover {
+  color: #007bff;
+  transform: translateY(-5px); /* Légère translation vers le haut au survol */
+}
+
+/* Styles pour l'intégration de la sidebar */
+.sidebar {
+  transition: transform 0.3s ease; /* Transition douce pour la sidebar */
+}
+
+.sidebar.open {
+  transform: translateX(0);
+}
+
+.sidebar.closed {
+  transform: translateX(-250px);
+}

@@ -1,0 +1,35 @@
+/* accueil.css */
+
+.accueil-container {
+    padding: 16px; 
+    min-height: 100vh;
+    display: flex;
+    justify-content: center; /* Centre horizontalement */
+    align-items: center; /* Centre verticalement */
+}
+
+.accueil-card {
+    padding: 32px;
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.accueil-title {
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.accueil-subtitle {
+    margin-bottom: 24px;
+    color: #6c757d; 
+}
+
+.accueil-form {
+    margin-top: 8px;
+}
+
+.accueil-button {
+    margin-top: 16px !important; 
+    padding: 10px 0 !important;
+}
