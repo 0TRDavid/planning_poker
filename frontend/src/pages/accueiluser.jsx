@@ -1,32 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import { 
+    Box, Container, Typography, Stack, Button, TextField, 
+    Card, CardContent, Divider, CircularProgress, Chip 
+} from '@mui/material';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
-import {
-  Box,
-  Container,
-  Typography,
-  Stack,
-  Button,
-  TextField,
-  Card,
-  CardContent,
-  CardActions,
-  Chip,
-  Divider,
-  CircularProgress
-} from '@mui/material';
+// Importation des fonctions API
+import { fetchSessions, createSession } from '../services/api'; // Ajustez le chemin
 
-
-
-//API qui va appeler les sessions existantes dans le back
-const fetchSessions = async () => {
-  const response = await fetch('http://localhost:8000/api/sessions/'); // URL de votre API Django
-  const sessions = await response.json();
-  console.log(sessions);
-  return sessions;
+// --- STYLES (Utilisation de l'approche SX de MUI pour la cohésion) ---
+const componentStyles = {
+    headerBox: {
+        mb: 3 
+    },
+    refreshButton: {
+        display: { xs: 'none', sm: 'inline-flex' } // Masquer le texte sur mobile si nécessaire
+    },
+    sessionCard: {
+        borderRadius: 2, 
+        '&:hover': { 
+            boxShadow: 3 // Légère ombre au survol
+        }
+    },
+    storyBox: {
+        border: '1px solid',
+        borderColor: 'grey.300',
+        p: 1,
+        borderRadius: 1
+    }
 };
+
+// --- LOGIQUE DU COMPOSANT ---
 
 export default function AccueilUser() {
   const [sessions, setSessions] = useState([]);
@@ -37,7 +43,7 @@ export default function AccueilUser() {
   const loadSessions = async () => {
     setLoading(true);
     try {
-      const data = await fetchSessions();  // On appel la fonction de récupération des sessions
+      const data = await fetchSessions();  // Appel via le fichier API
       setSessions(data);
     } finally {
       setLoading(false);
@@ -50,25 +56,42 @@ export default function AccueilUser() {
 
   const handleJoin = () => {
     if (!joinCode.trim()) return;
-    // Logique de connexion à la session (à intégrer avec le backend)
+    // Ici, vous feriez l'appel à joinSession(joinCode)
     alert('Join session: ' + joinCode);
     setJoinCode('');
   };
 
   const handleCreate = async () => {
     setCreating(true);
-    // Logique de création de session (à intégrer avec le backend)
-    await new Promise(r => setTimeout(r, 500));
-    alert('Session créée');
-    setCreating(false);
-    loadSessions();
+    try {
+        await createSession(); // Appel via le fichier API
+        alert('Session créée');
+        loadSessions(); // Recharger la liste après création
+    } catch (e) {
+        alert("Erreur lors de la création.");
+    } finally {
+        setCreating(false);
+    }
   };
+  
+  // --- FONCTION DE RENDU SECONDAIRE (Pour un code plus clair) ---
+  const getStatusChip = (status) => {
+      const map = {
+          'open': { label: 'Ouverte', color: 'success' },
+          'in-progress': { label: 'En cours', color: 'warning' },
+          'closed': { label: 'Terminée', color: 'default' },
+      };
+      const { label, color } = map[status] || map['closed'];
+      return <Chip size="small" label={label} color={color} />;
+  };
+
+  // --- RENDER DU COMPOSANT ---
 
   return (
     
     <Container maxWidth="md" sx={{ py: 6 }}>
       <Stack spacing={4}>
-        <Box>
+        <Box sx={componentStyles.headerBox}>
           <Typography variant="h4" fontWeight={600}>
             Planning Poker
           </Typography>
@@ -77,7 +100,7 @@ export default function AccueilUser() {
           </Typography>
         </Box>
 
-        {/* Carte pour rejoindre une session */}
+        {/* 1. Rejoindre une session */}
         <Card variant="outlined">
           <CardContent>
             <Stack spacing={2}>
@@ -103,7 +126,7 @@ export default function AccueilUser() {
           </CardContent>
         </Card>
 
-        {/* Carte affichant les sessions de l'utilisateur */}
+        {/* 2. Affichage des sessions de l'utilisateur */}
         <Card variant="outlined">
           <CardContent>
             <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
@@ -115,6 +138,7 @@ export default function AccueilUser() {
                   onClick={loadSessions}
                   startIcon={<RefreshIcon />}
                   disabled={loading}
+                  sx={componentStyles.refreshButton}
                 >
                   Rafraîchir
                 </Button>
@@ -130,17 +154,21 @@ export default function AccueilUser() {
               </Stack>
             </Stack>
             <Divider sx={{ mb: 2 }} />
+            
+            {/* Affichage des états (Chargement/Vide) */}
             {loading && (
               <Box display="flex" justifyContent="center" py={3}>
                 <CircularProgress size={28} />
               </Box>
             )}
             {!loading && sessions.length === 0 && (
-              <Typography color="text.secondary">Aucune session.</Typography>
+              <Typography color="text.secondary">Aucune session trouvée.</Typography>
             )}
+
+            {/* Liste des sessions */}
             <Stack spacing={2}>
               {sessions.map(s => (
-                <Card key={s.id_session} variant="outlined" sx={{ borderRadius: 2 }}>
+                <Card key={s.id_session} variant="outlined" sx={componentStyles.sessionCard}>
                   <CardContent>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                       <Box>
@@ -151,29 +179,14 @@ export default function AccueilUser() {
                           Code: {s.id_session}
                         </Typography>
                       </Box>
-                      <Chip
-                        size="small"
-                        label={
-                          s.status === 'open'
-                            ? 'Ouverte'
-                            : s.status === 'in-progress'
-                            ? 'En cours'
-                            : 'Terminée'
-                        }
-                        color={
-                          s.status === 'open'
-                            ? 'success'
-                            : s.status === 'in-progress'
-                            ? 'warning'
-                            : 'default'
-                        }
-                      />
+                      {/* Utilisation de la fonction d'aide pour le statut */}
+                      {getStatusChip(s.status)} 
                     </Stack>
 
-                    {/* Affichage de la liste des stories */}
+                    {/* Affichage des stories */}
                     <Stack spacing={1} mt={2}>
-                      {s.stories.map((story, index) => (
-                        <Box key={story.titre + index} sx={{ border: '1px solid #ccc', p: 1, borderRadius: 1 }}>
+                      {s.stories && s.stories.map((story, index) => (
+                        <Box key={story.titre + index} sx={componentStyles.storyBox}>
                           <Typography variant="subtitle2" fontWeight={500}>
                             {story.titre}
                           </Typography>
