@@ -24,9 +24,10 @@ export const fetchSessions = async () => {
  * Crée une nouvelle session via l'API Django et envoie le tableau de stories.
  * @param {string} titre - Le titre de la nouvelle session.
  * @param {Array<Object>} stories - La liste des user stories au format JSON.
+ * @param {string} mode_de_jeu - Le mode de jeu sélectionné.
  * @returns {Promise<Object>} Les données de la session créée.
  */
-export const createSession = async (titre, stories = []) => {
+export const createSession = async (titre, stories = [], mode_de_jeu) => {
     try {
         const response = await fetch(`${API_BASE_URL}/sessions/`, {
             method: 'POST',
@@ -37,6 +38,7 @@ export const createSession = async (titre, stories = []) => {
             body: JSON.stringify({
                 titre: titre,
                 stories: stories, // <--- C'EST ICI QUE LE TABLEAU COMPLET DOIT ÊTRE ENVOYÉ
+                mode_de_jeu: mode_de_jeu,
             }),
         });
 

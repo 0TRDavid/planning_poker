@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Container, Typography, Stack, Button, Card, CardContent, Divider, FormControl, RadioGroup, FormControlLabel, Radio, Alert} from '@mui/material';
+import { Container, Typography, Stack, Button, Card, CardContent, Divider, FormControl, RadioGroup, FormControlLabel, Radio, Alert, TextField} from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SendIcon from '@mui/icons-material/Send';
 import { createSession } from '../services/api';
@@ -45,6 +45,8 @@ export default function ModeSelection() {
         { value: 'majority_abs', label: 'Majorité Absolue' },
         { value: 'majority_rel', label: 'Majorité Relative' },
     ];
+    const [titreSession, setTitreSession] = useState("");
+
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
@@ -72,14 +74,14 @@ export default function ModeSelection() {
     };
 
 const handleSaveAndRedirect = async () => { 
+
     if (!fileData || fileData.length === 0) {
         setError("Veuillez importer au moins une User Story.");
         return;
     }
 
     try {
-        const titreSession = "Nouvelle Session - " + new Date().toLocaleString();
-        const newSession = await createSession(titreSession, fileData); 
+        const newSession = await createSession(titreSession, fileData, gameMode); 
         //window.location.href = `/partie/${newSession.id_session}?mode=${gameMode}`; 
         window.location.href = `/accueiluser`;
 
@@ -97,6 +99,18 @@ const handleSaveAndRedirect = async () => {
                     <Typography variant="body2" color="text.secondary" mb={3}>
                         Sélectionnez le mode de jeu et importez vos User Stories.
                     </Typography>
+                    <Divider sx={{ mb: 3 }} />
+                    {/* Donner le titre de la session */}
+
+                    <TextField
+                        label="Titre de la Session"
+                        fullWidth
+                        margin="normal"
+                        value={titreSession}
+                        onChange={(e) => setTitreSession(e.target.value)}>
+                    </TextField>
+                    
+                    
 
                     {/* 1. Sélection du Mode de Jeu */}
                     <Divider />

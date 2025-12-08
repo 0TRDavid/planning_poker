@@ -9,6 +9,17 @@ class Session(models.Model):
     id_session = models.CharField(max_length=6, unique=True, editable=False, default=generate_six_digit_code)
     titre = models.CharField(max_length=255)
     stories = models.JSONField()
+    mode_de_jeu = models.CharField(max_length=50)
 
     def __str__(self):
-        return f"{self.titre} ({self.id_session})"
+        return f"{self.titre} ({self.id_session} - {self.mode_de_jeu})"
+    
+    
+class Partie(models.Model):
+    username = models.CharField(max_length=100)
+    session = models.ForeignKey(Session, on_delete=models.CASCADE)
+    carte_choisie = models.CharField(max_length=10, blank=True, null=True)
+    a_vote = models.BooleanField(default=False)
+    # est_admin = models.BooleanField(default=False)
+    def __str__(self):
+        return f"{self.username} in session {self.session.id_session}"

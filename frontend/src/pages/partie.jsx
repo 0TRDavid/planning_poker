@@ -9,6 +9,9 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import RefreshIcon from '@mui/icons-material/Refresh';
 //import { getCardSet, getCardSvg } from '../services/card'; 
+// Importation des fonctions API
+import { fetchSessions } from '../services/api'
+import { getCardSet, getCardSvg } from '../services/card';
 
 // --- STYLES ---
 const componentStyles = {

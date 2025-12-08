@@ -24,7 +24,7 @@ Including another URLconf
 
 router = DefaultRouter()
 router.register(r'sessions', views.SessionViewSet)
-
+router.register(r'joinPartie', views.JoinPartieViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),

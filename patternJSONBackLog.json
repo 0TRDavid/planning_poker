@@ -2,13 +2,11 @@
     
     { 
     "titre": "test",
-    "contenu": "juste un test",
-    "valeur": 3
+    "contenu": "juste un test"
 },
 {
     "titre": "Enregistrer un utilisateur dans un cookie",
-    "contenu": "Utiliser la bibliothèque js-cookie pour enregistrer et récupérer le nom de l'utilisateur dans un cookie. Lorsqu'un utilisateur entre son nom, le stocker dans un cookie avec une durée d'expiration appropriée. Lors du chargement de la page, vérifier si le cookie existe et pré-remplir le champ du nom de l'utilisateur si c'est le cas.",
-    "valeur": 5
+    "contenu": "Utiliser la bibliothèque js-cookie pour enregistrer et récupérer le nom de l'utilisateur dans un cookie. Lorsqu'un utilisateur entre son nom, le stocker dans un cookie avec une durée d'expiration appropriée. Lors du chargement de la page, vérifier si le cookie existe et pré-remplir le champ du nom de l'utilisateur si c'est le cas."
 }
 
 ]

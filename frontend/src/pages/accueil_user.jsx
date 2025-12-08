@@ -26,6 +26,7 @@ const componentStyles = {
     }
 };
 
+
 // --- LOGIQUE DU COMPOSANT ---
 
 export default function AccueilUser() {
@@ -33,6 +34,8 @@ export default function AccueilUser() {
   const [loading, setLoading] = useState(false);
   const [joinCode, setJoinCode] = useState('');
   const [creating, setCreating] = useState(false);
+
+
 
   const loadSessions = async () => {
     setLoading(true);
@@ -48,11 +51,6 @@ export default function AccueilUser() {
     loadSessions();
   }, []);
 
-  const handleJoin = () => {
-    if (!joinCode.trim()) return;
-    alert('Join session: ' + joinCode);
-    setJoinCode('');
-  };
 
   const handleCreate = async () => {
     setCreating(true);
@@ -74,6 +72,34 @@ export default function AccueilUser() {
       return <Chip size="small" label={label} color={color} />;
   };
 
+  // Fonction pour rejoindre une session
+  
+  const handleJoin = async () => {
+    if (!joinCode.trim()) return;
+    // Envoi a l'api partie l'id_session et le username (depuis cookie)
+    const username = document.cookie
+      .split('; ')
+      .find((c) => c.startsWith('username='))
+      ?.split('=')[1];
+
+    if (!username) {
+      console.warn('Username cookie not found');
+    } else {
+      try {
+        console.log('Joining session', joinCode, 'as', username);
+        await fetch('/api/joinPartie/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ session: joinCode, username }),
+        });
+        // Ouvre la page partie
+      window.location.href = `/partie/${joinCode}`;
+      } catch (err) {
+        console.error('Failed to join session', err);
+      }
+    }
+    setJoinCode('');
+  };
   // --- RENDER DU COMPOSANT ---
 
   return (
@@ -165,11 +191,13 @@ export default function AccueilUser() {
                           {s.titre}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Code: {s.id_session}
+                          Code: {s.id_session} - Mode de jeu: {s.mode_de_jeu}
                         </Typography>
-                      </Box>
+                        </Box>
                       {/* Utilisation de la fonction d'aide pour le statut */}
+                      
                       {getStatusChip(s.status)} 
+                       {/* A modifier pour voir si les valeurs sont pleines ou ajouter une colonne status a la table session */}
                     </Stack>
 
                     {/* Affichage des stories */}
