@@ -5,8 +5,7 @@ import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
 
 // Importation des fonctions API
-import { fetchSessions } from '../services/api';
-
+import { fetchSessions, joinPartie } from '../services/api';
 // --- STYLES (Utilisation de l'approche SX de MUI pour la cohésion) ---
 const componentStyles = {
     refreshButton: {
@@ -26,6 +25,7 @@ const componentStyles = {
     }
 };
 
+
 // --- LOGIQUE DU COMPOSANT ---
 
 export default function AccueilUser() {
@@ -34,6 +34,8 @@ export default function AccueilUser() {
   const [joinCode, setJoinCode] = useState('');
   const [creating, setCreating] = useState(false);
 
+
+// Appel l'API pour récupérer les sessions de la bdd
   const loadSessions = async () => {
     setLoading(true);
     try {
@@ -44,16 +46,7 @@ export default function AccueilUser() {
     }
   };
 
-  useEffect(() => {
-    loadSessions();
-  }, []);
-
-  const handleJoin = () => {
-    if (!joinCode.trim()) return;
-    alert('Join session: ' + joinCode);
-    setJoinCode('');
-  };
-
+// Renvoi vers la page de création de session
   const handleCreate = async () => {
     setCreating(true);
     try {
@@ -62,8 +55,40 @@ export default function AccueilUser() {
         alert("Erreur lors de la création.");
     }
   };
+
+  // Appel l'API pour envoyer le code session et le username puis redirige vers la page partie
+  const handleJoin = async () => {
+    if (!joinCode.trim()) return;
+    // Envoi a l'api partie l'id_session et le username (depuis cookie)
+    const username = document.cookie
+      .split('; ')
+      .find((c) => c.startsWith('username='))
+      ?.split('=')[1];
+    if (!username) {
+      console.warn('Username cookie not found');
+    } else {
+      try {
+        await joinPartie(joinCode, username);
+        // Ouvre la page partie
+      window.location.href = `/partie/${joinCode}`;
+      } catch (err) {
+        console.error('Failed to join session', err);
+      }
+    }
+    setJoinCode('');
+  };
+
+
+
+
+
   
-  // --- FONCTION DE RENDU SECONDAIRE (Pour un code plus clair) ---
+ // Charge les sessions au montage du composant (grace au fetchSessions plus haut)
+  useEffect(() => {
+    loadSessions(); 
+  }, []);
+
+    // --- FONCTION DE RENDU SECONDAIRE (Pour un code plus clair) ---
   const getStatusChip = (status) => {
       const map = {
           'open': { label: 'Ouverte', color: 'success' },
@@ -73,9 +98,7 @@ export default function AccueilUser() {
       const { label, color } = map[status] || map['closed'];
       return <Chip size="small" label={label} color={color} />;
   };
-
   // --- RENDER DU COMPOSANT ---
-
   return (
     
     <Container maxWidth="md" sx={{ py: 6 }}>
@@ -165,11 +188,13 @@ export default function AccueilUser() {
                           {s.titre}
                         </Typography>
                         <Typography variant="caption" color="text.secondary">
-                          Code: {s.id_session}
+                          Code: {s.id_session} - Mode de jeu: {s.mode_de_jeu}
                         </Typography>
-                      </Box>
+                        </Box>
                       {/* Utilisation de la fonction d'aide pour le statut */}
+                      
                       {getStatusChip(s.status)} 
+                       {/* A modifier pour voir si les valeurs sont pleines ou ajouter une colonne status a la table session */}
                     </Stack>
 
                     {/* Affichage des stories */}

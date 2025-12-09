@@ -27,3 +27,12 @@ affichage du JSON récupéré dans le Front
 ### ETQU je veux rejoindre une session existante 
 
 ### ETQUS on veut jouer 
+
+
+
+Une table partie dans le back qui recois lorsque l'utilisateur rejoins la session son username, l'id_session ensuite cela est modifié quand il vote. Quand tous les utilisateur on bollean = True sur a voter pour la meme session, 
+ 1 . le champ stories de la table Session est modifié (on renvoi un nouveau JSON en ajoutant une valeur à la userstory!!)
+ 2 . les valeurs dans la table partie sont remises à False et rien pour la valeur votée 
+
+ 3 . on passe à l'affichage de la troisieme userstory
+ S

@@ -24,6 +24,14 @@ Including another URLconf
 
 router = DefaultRouter()
 router.register(r'sessions', views.SessionViewSet)
+router.register(r'joinPartie', views.JoinPartieViewSet)
+
+
+# Dans urls.py, affiche tous les basenames enregistrés
+print("Basenames enregistrés:")
+for prefix, viewset, basename in router.registry:
+    print(f"  - {prefix:20} → {basename}")
+
 
 
 urlpatterns = [
