@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import { 
     Box, Container, Typography, Stack, Button, Card, CardContent, 
@@ -10,8 +10,96 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import RefreshIcon from '@mui/icons-material/Refresh';
 //import { getCardSet, getCardSvg } from '../services/card'; 
 // Importation des fonctions API
-import { fetchSessions } from '../services/api'
+import { fetchSessionById, voteCard } from '../services/api'
 import { getCardSet, getCardSvg } from '../services/card';
+
+
+// Etapes de la partie :
+// 1. Récupérer l'ensemble des infos de la session (stories, mode de jeu) via l'API grâce à l'id_session dans l'URL
+// 2. Afficher la premiere story qui a une valeur = NULL (non encore votée)
+// L'utilisateur vote en cliquant sur une carte
+// 3. Envoyer le vote au serveur API --> voteJoueur
+// 4. Interrogation régulière (polling) pour récupérer les votes des autres joueurs et savoir si tout le monde a voté
+// Lorsque le back valide que tous les joueurs ont voté, on calcule la valeur mise sur la story, maj et envoi au back --> majSession 
+// Afficher les votes reçus (avec une animation sympa)
+// On retourne à l'étape 2 jusqu'à la fin des stories // sessions fini ? on drop la table partie et on affiche les résultats finaux
+
+
+// Fais gaffe de bien drop les lignes dans la table partie si tu veux faire des test sinon tu peux pas rejoindre 2 fois !!
+
+
+
+
+
+// ET APPAREMMENT DJANGO CHANNEL POUR LE TEMPS RÉEL MAIS PAS LE TEMPS DE L'IMPLÉMENTER LÀ MAINTENANT
+
+
+
+
+// test websocket
+
+
+// function Session() {
+//     const [messages, setMessages] = useState([]);
+//     const ws = useRef(null);
+
+//     useEffect(() => {
+//         // Connectez-vous au WebSocket
+//         ws.current = new WebSocket(`ws://localhost:8000/ws/session/${id_session}/`);
+
+//         ws.current.onopen = () => {
+//             console.log('WebSocket connecté');
+//         };
+
+//         ws.current.onmessage = (event) => {
+//             const data = JSON.parse(event.data);
+//             setMessages(prev => [...prev, data]);
+//             // Mettez à jour l'interface (votes, nouvelles histoires, etc.)
+//         };
+
+//         ws.current.onclose = () => {
+//             console.log('WebSocket fermé');
+//         };
+
+//         return () => {
+//             ws.current.close();
+//         };
+//     }, [id_session]);
+
+//     const sendMessage = (message) => {
+//         if (ws.current.readyState === WebSocket.OPEN) {
+//             ws.current.send(JSON.stringify(message));
+//         }
+//     };
+
+//     return (
+//         <div>
+//             <ul>
+//                 {messages.map((msg, i) => (
+//                     <li key={i}>{msg.content}</li>
+//                 ))}
+//             </ul>
+//             <button onClick={() => sendMessage({type: 'vote', value: '5'})}>
+//                 Voter
+//             </button>
+//         </div>
+//     );
+// }
+
+// export default Session;
+// fin test websocket
+
+
+
+
+
+
+
+
+
+
+
+
 
 // --- STYLES ---
 const componentStyles = {
@@ -54,7 +142,11 @@ export default function GameSession() {
     
     // 1. Récupération du mode de jeu depuis l'URL (ex: /partie/123456?mode=strict)
     const queryParams = new URLSearchParams(location.search);
-    const gameMode = queryParams.get('mode') || 'strict';
+    const gameMode = queryParams.get('mode') || 'strict'; // Pas géré pour le moment
+    const username = (() => {
+        const match = document.cookie.match(/(?:^|;\s*)username=([^;]+)/);
+        return match ? decodeURIComponent(match[1]) : null;
+    })();
 
     // 2. État du jeu
     const [currentStory, setCurrentStory] = useState(null); // Story en cours
@@ -66,28 +158,33 @@ export default function GameSession() {
     // 3. Jeux de cartes selon les consignes (Fibonacci + Spéciaux)
     const cardSet = getCardSet(gameMode);
     
-    // 4. SIMULATION de récupération de session
-    const fetchSessionData = useCallback(async () => {
-        setLoading(true);
-        // 🚨 REMPLACER PAR VOTRE VÉRITABLE APPEL API 
-        // Ex: fetch(`/api/sessions/${id_session}/current_story`)
-        await new Promise(r => setTimeout(r, 800)); 
+    // Etape1 : récupération de session
+const fetchSessionData = useCallback(async () => {
+    setLoading(true);
+    try {
+        const data = await fetchSessionById(id_session);
+        console.log("Données de la session récupérées:", data);
         
-        // Données simulées
-        setCurrentStory({
-            id: 1,
-            titre: "Implémenter la page de sélection du mode de jeu.",
-            contenu: "Créer le composant React 'ModeSelection' pour permettre à l'utilisateur de choisir entre Stricte, Moyenne, Médiane, etc., et d'importer le JSON des stories.",
-            valeur: null, // Valeur finale de la story
-        });
+        let currentStory = data.stories && data.stories.length > 0 ? data.stories[0] : null;
+        setCurrentStory(currentStory);
+
+
+        await new Promise(r => setTimeout(r, 800));
+
+        // Simuler des votes reçus (à remplacer par WebSocket ou autre logique temps réel)
         setVotes({
             "Alice": "5",
             "Bob": "8",
             "Charlie": "5",
-            "David": null, // N'a pas encore voté
+            "David": null,
         });
+    } catch (error) {
+        console.error("Erreur lors de la récupération des données de la session:", error);
+    } finally {
         setLoading(false);
-    }, [id_session]);
+    }
+}, [id_session]);
+
 
     useEffect(() => {
         fetchSessionData();
@@ -98,6 +195,7 @@ export default function GameSession() {
     const handleCardClick = (value) => {
         // Logique d'envoi du vote via WebSocket (omise ici)
         setSelectedCard(value);
+        voteCard(id_session, username, value);
         console.log(`Vote envoyé pour la carte: ${value}`);
     };
 

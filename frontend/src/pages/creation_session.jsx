@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Container, Typography, Stack, Button, Card, CardContent, Divider, FormControl, RadioGroup, FormControlLabel, Radio, Alert, TextField} from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SendIcon from '@mui/icons-material/Send';
-import { createSession } from '../services/api';
+import { createSession, joinPartie} from '../services/api';
 
 // --- STYLES ---
 const componentStyles = {
@@ -48,6 +48,7 @@ export default function ModeSelection() {
     const [titreSession, setTitreSession] = useState("");
 
 
+    // Gestion de l'importation du fichier JSON
     const handleFileChange = (event) => {
         const file = event.target.files[0];
         if (!file) return;
@@ -57,7 +58,7 @@ export default function ModeSelection() {
             setFileData(null);
             return;
         }
-
+        // Lecture du fichier JSON
         const reader = new FileReader();
         reader.onload = (e) => {
             try {
@@ -73,22 +74,35 @@ export default function ModeSelection() {
         reader.readAsText(file);
     };
 
-const handleSaveAndRedirect = async () => { 
+// Enregistrement de la session et redirection avec appel de l'API createSession
+const handleSaveAndRedirect = async (lieu) => { 
 
     if (!fileData || fileData.length === 0) {
         setError("Veuillez importer au moins une User Story.");
         return;
     }
-
+    // Appel de l'API pour créer la session
     try {
-        const newSession = await createSession(titreSession, fileData, gameMode); 
-        //window.location.href = `/partie/${newSession.id_session}?mode=${gameMode}`; 
-        window.location.href = `/accueiluser`;
 
+        const rep = await createSession(titreSession, fileData, gameMode); 
+        if (lieu === 'partie') {
+            //console.log("Session créée avec l'ID :", id_session);
+            // recupère le id_session de la session créée pour rejoindre la partie = le retour de l'API createSession + le username depuis le cookie
+            await joinPartie(rep.id_session, document.cookie
+              .split('; ')
+              .find((c) => c.startsWith('username='))
+              ?.split('=')[1]);
+
+            window.location.href = `/partie/${rep.id_session}?mode=${gameMode}`; 
+        }
+        else {
+            window.location.href = `/accueiluser`;
+        }
     } catch (e) {
         setError(`Échec de la création de session : ${e.message}`);
     }
 };
+
     return (
         <Container maxWidth="md" sx={{ py: 6, paddingTop: '100px' }}>
             <Card variant="outlined" sx={componentStyles.card}>
@@ -164,15 +178,25 @@ const handleSaveAndRedirect = async () => {
                             Importer JSON
                         </Button>
                         
-                        {/* Bouton d'enregistrement et de redirection */}
+                        {/* Bouton d'enregistrement et de redirection accueil */}
                         <Button
                             variant="contained"
                             startIcon={<SendIcon />}
-                            onClick={handleSaveAndRedirect}
+                            onClick={() => handleSaveAndRedirect('accueil')}
                             disabled={!fileData}
                             sx={{ flex: 1 }}
                         >
-                            Enregistrer & Continuer
+                            Enregistrer
+                        </Button>
+                        {/* Bouton d'enregistrement et de redirection partie */}
+                        <Button
+                            variant="contained"
+                            startIcon={<SendIcon />}
+                            onClick={() => handleSaveAndRedirect('partie')}
+                            disabled={!fileData}
+                            sx={{ flex: 1 }}
+                        >
+                            Enregistrer & rejoindre
                         </Button>
                     </Stack>
                     

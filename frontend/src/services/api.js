@@ -1,6 +1,6 @@
 // src/services/api.js
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api'; 
-
+import axios from "axios";  
 /**
  * Récupère la liste des sessions existantes depuis le backend.
  * @returns {Promise<Array>} Liste des sessions.
@@ -20,6 +20,23 @@ export const fetchSessions = async () => {
   }
 };
 
+/**
+ * Envoi les infos de l'utilisateur pour rejoindre une partie avec son code session (alimente la table partie)
+ */
+ 
+
+export const joinPartie = async (id_session, username) => {
+  
+          const res = await fetch('/api/joinPartie/', {
+            method: 'POST',
+            
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id_session, username }),
+          });
+          if (!res.ok) throw new Error('Failed to join');
+          
+          return res.json().catch(() => null);
+        };
 /**
  * Crée une nouvelle session via l'API Django et envoie le tableau de stories.
  * @param {string} titre - Le titre de la nouvelle session.
@@ -55,4 +72,65 @@ export const createSession = async (titre, stories = [], mode_de_jeu) => {
         console.error("Échec de la création de session:", error);
         throw error;
     }
+};
+
+
+// Récupérer une seule session par son ID
+export const fetchSessionById = async (id_session) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/sessions/${id_session}/`);
+    if (!response.ok) {
+      throw new Error(`Erreur HTTP: ${response.status}`);
+    }
+    const session = await response.json();
+    return session;
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la session:", error);
+    return null;
+  }
+};
+
+
+
+// API de la partie (voter, récupérer les votes, etc.) avec axios ou pas 
+
+
+export const voteCard = async (id_session, username, carte_choisie) => {
+  try {
+    const response = await axios.post('/api/vote/', { id_session, username, carte_choisie });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors du vote:", error);
+    throw error;
+  } 
+};
+
+
+export const fetchVotes = async (id_session) => {
+  try {
+    const response = await axios.get('/api/votes/', { params: { id_session } });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la récupération des votes:", error);
+    throw error;
+  }
+};
+
+export const checkAllVoted = async (id_session) => {
+  try {
+    const response = await axios.get('/api/check_all_voted/', { params: { id_session } });
+    return response.data.all_voted;
+  } catch (error) {
+    console.error("Erreur lors de la vérification des votes:", error);
+    throw error;
+  }
+};
+export const endStory = async (id_session) => {
+  try {
+    const response = await axios.post('/api/end_story/', { id_session });
+    return response.data;
+  } catch (error) {
+    console.error("Erreur lors de la fin de l'histoire:", error);
+    throw error;
+  }
 };
