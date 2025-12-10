@@ -102,7 +102,7 @@ export default function GameSession() {
     // Handlers
     const handleCardClick = async (value) => {
         setSelectedCard(value);
-        await voteCard(id_session, username, value);
+        //await voteCard(id_session, username, value);
         refreshGameState();
     };
 

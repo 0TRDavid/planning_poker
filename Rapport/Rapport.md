@@ -36,3 +36,6 @@ Une table partie dans le back qui recois lorsque l'utilisateur rejoins la sessio
 
  3 . on passe à l'affichage de la troisieme userstory
  S
+
+
+ Si une session est pleine, empecher de la rejoindre ou page de dl ! par contre on ne peut le faire qu'une seule fois !! vider table partie a l'ouverture re resultat ?!  

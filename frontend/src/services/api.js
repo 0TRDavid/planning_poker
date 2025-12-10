@@ -31,10 +31,10 @@ export const joinPartie = async (id_session, username) => {
             method: 'POST',
             
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_session, username }),
+            body: JSON.stringify({ id_session, username}),
           });
           if (!res.ok) throw new Error('Failed to join');
-          
+          res
           return res.json().catch(() => null);
         };
 /**

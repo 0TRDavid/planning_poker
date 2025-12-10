@@ -6,7 +6,7 @@ from .models import Partie
 class SessionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Session
-        fields = ['id_session', 'titre', 'stories', 'mode_de_jeu']
+        fields = ['id_session', 'titre', 'stories', 'mode_de_jeu', 'status']
 
 
 class PartieSerializer(serializers.ModelSerializer):
@@ -17,13 +17,13 @@ class PartieSerializer(serializers.ModelSerializer):
 
 class JoinPartieSerializer(serializers.ModelSerializer):
     id_session = serializers.PrimaryKeyRelatedField(
-        queryset=Session.objects.all(),
-        write_only=True
-    )
+        queryset=Session.objects.all())
+    status = serializers.SerializerMethodField() # Champ en lecture seule pour le status de la session
     class Meta:
         model = Partie
-        fields = ['username', 'id_session']  # Inclure id_session ici
-
+        fields = ['username', 'id_session', 'status']  # Inclure id_session ici
+    def get_status(self, obj):
+        return obj.id_session.status # Récupère le status de la session associée et le retourne
 
 # MAJ de la table Partie pour gérer le vote
 class VoteSerializer(serializers.ModelSerializer):

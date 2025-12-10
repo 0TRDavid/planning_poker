@@ -67,9 +67,17 @@ export default function AccueilUser() {
       console.warn('Username cookie not found');
     } else {
       try {
-        await joinPartie(joinCode, username);
+        const res = await joinPartie(joinCode, username);
+
+        if (res?.status === 'closed') {
+          console.log('Session closed, redirecting to results');
+          window.location.href = `/partie/${joinCode}/resultats`;
+          return; // si tu mets pas de return ici, il continue et ouvre la page partie...
+        } else {
+          window.location.href = `/partie/${joinCode}`;
+        }
         // Ouvre la page partie
-      window.location.href = `/partie/${joinCode}`;
+      //window.location.href = `/partie/${joinCode}`;
       } catch (err) {
         console.error('Failed to join session', err);
       }
@@ -86,7 +94,7 @@ export default function AccueilUser() {
   const getStatusChip = (status) => {
       const map = {
           'open': { label: 'Ouverte', color: 'success' },
-          'in-progress': { label: 'En cours', color: 'warning' },
+          'in_progress': { label: 'En cours', color: 'warning' },
           'closed': { label: 'Terminée', color: 'default' },
       };
       const { label, color } = map[status] || map['closed'];
@@ -185,9 +193,7 @@ export default function AccueilUser() {
                         </Typography>
                         </Box>
                       {/* Utilisation de la fonction d'aide pour le statut */}
-                      
                       {getStatusChip(s.status)} 
-                       {/* A modifier pour voir si les valeurs sont pleines ou ajouter une colonne status a la table session */}
                     </Stack>
 
                     {/* Affichage des stories */}
@@ -201,7 +207,7 @@ export default function AccueilUser() {
                             {story.contenu}
                           </Typography>
                           <Typography variant="caption" color="text.secondary">
-                            Valeur: {story.valeur}
+                            Valeur: {story.valeur_finale}
                           </Typography>
                         </Box>
                       ))}

@@ -9,7 +9,7 @@ class Session(models.Model):
     titre = models.CharField(max_length=255)
     stories = models.JSONField()
     mode_de_jeu = models.CharField(max_length=50)
-
+    status = models.CharField(max_length=50, default='open') # open, in_progress, closed
     def __str__(self):
         return f"{self.titre} ({self.id_session} - {self.mode_de_jeu})"
     
