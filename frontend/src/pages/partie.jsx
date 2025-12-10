@@ -73,15 +73,16 @@ export default function GameSession() {
 
     // --- GESTION DU BOUTON SUIVANT ---
     const handleNextStory = async () => {
-        // APPEL AU BACK POUR SAUVEGARDER LE RÉSULTAT
         try {
-            await closeStory(id_session, storyIndex);
+            await closeStory(id_session, storyIndex, selectedCard); 
             
             const nextIndex = storyIndex + 1;
+            
+            // ENSUITE on nettoie l'interface pour le tour suivant
             if (nextIndex < allStories.length) {
                 setStoryIndex(nextIndex);
                 setShowVotes(false);
-                setSelectedCard(null);
+                setSelectedCard(null); // <-- Le reset se fait ici, APRES l'envoi
                 setVotes({});
             } else {
                 navigate(`/partie/${id_session}/resultats`);

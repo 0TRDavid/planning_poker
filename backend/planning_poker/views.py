@@ -12,35 +12,35 @@ class SessionViewSet(viewsets.ModelViewSet):
     def close_story(self, request, pk=None):
         session = self.get_object()
         
-        # Récupération et validation de l'index
         story_index = request.data.get('story_index')
+        custom_value = request.data.get('final_value') # <--- ON RÉCUPÈRE LA VALEUR FORCÉE
+
         if story_index is None:
             return Response({'error': 'Index manquant'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Calcul de la moyenne des votes (exclut les cartes spéciales)
-        votes = Partie.objects.filter(id_session=session)
-        valeurs = [int(v.carte_choisie) for v in votes if v.carte_choisie and v.carte_choisie.isdigit()]
-        
-        resultat_final = round(sum(valeurs) / len(valeurs)) if valeurs else 0
+        # SI une valeur est envoyée (ex: "5", "8", "?"), on l'utilise directement
+        if custom_value:
+            resultat_final = custom_value
+        else:
+            # SINON : Calcul automatique de la moyenne (fallback)
+            votes = Partie.objects.filter(id_session=session)
+            valeurs = [int(v.carte_choisie) for v in votes if v.carte_choisie and v.carte_choisie.isdigit()]
+            resultat_final = round(sum(valeurs) / len(valeurs)) if valeurs else 0
 
-        # Mise à jour du JSON de la session
-        stories = list(session.stories) # Copie pour mutabilité
+        # Mise à jour du JSON
+        stories = list(session.stories)
         if 0 <= story_index < len(stories):
             stories[story_index]['valeur_finale'] = str(resultat_final)
             session.stories = stories
             session.save()
             
-            # Reset des votes pour le round suivant
-            votes.update(carte_choisie=None, a_vote=False)
+            # Reset des votes
+            Partie.objects.filter(id_session=session).update(carte_choisie=None, a_vote=False)
             
-            return Response({
-                'status': 'Story validée', 
-                'valeur_finale': resultat_final,
-                'stories': session.stories
-            })
+            return Response({'status': 'Validé', 'valeur_finale': resultat_final})
         
         return Response({'error': 'Index invalide'}, status=status.HTTP_400_BAD_REQUEST)
-
+    
 class JoinPartieViewSet(viewsets.ModelViewSet):
     queryset = Partie.objects.all()
     serializer_class = JoinPartieSerializer

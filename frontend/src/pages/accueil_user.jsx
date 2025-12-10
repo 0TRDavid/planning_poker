@@ -116,7 +116,6 @@ export default function AccueilUser() {
                   label="Code session"
                   value={joinCode}
                   onChange={e => setJoinCode(e.target.value.toUpperCase())}
-                  inputProps={{ maxLength: 10, style: { letterSpacing: 2 } }}
                   sx={{ flex: 1 }}
                 />
                 <Button

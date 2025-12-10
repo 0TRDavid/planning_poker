@@ -32,7 +32,7 @@ export default function Resultats() {
         // Création d'un lien invisible pour cliquer dessus
         const link = document.createElement('a');
         link.href = href;
-        link.download = `resultats_session_${id_session}.json`;
+        link.download = `${id_session}.json`;
         document.body.appendChild(link);
         link.click();
         
