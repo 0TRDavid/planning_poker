@@ -209,8 +209,8 @@ const fetchSessionData = useCallback(async () => {
     }
 
     return (
-        <Container maxWidth="lg" sx={{ py: 4 }}>
-            <Stack spacing={3}>
+        <Container maxWidth="lg" sx={{height:"90%" ,width:"100%" ,paddingTop: '80px' }}>
+            <Stack spacing={2}>
                 <Box>
                     <Typography variant="h5" fontWeight={700}>
                         Session : {id_session} 

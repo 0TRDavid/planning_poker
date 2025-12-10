@@ -24,8 +24,8 @@ const CARD_SVG_MAP = {
     '20': Card20,
     '40': Card40,
     '100': Card100,
-    'coffee': CardCoffee, // Utilisez 'coffee' comme valeur
-    '?': CardInterro, // Utilisez '?' comme valeur
+    'coffee': CardCoffee,
+    '?': CardInterro, 
 };
 
 // Ensemble de cartes standard pour tous les modes
