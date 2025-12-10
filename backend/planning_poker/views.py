@@ -10,10 +10,6 @@ class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
     serializer_class = SessionSerializer
 
-class PartieViewSet(viewsets.ModelViewSet):
-    queryset = Partie.objects.all()
-    serializer_class = PartieSerializer
-
 class JoinPartieViewSet(viewsets.ModelViewSet):
     queryset = Partie.objects.all()
     serializer_class = JoinPartieSerializer
@@ -21,3 +17,15 @@ class JoinPartieViewSet(viewsets.ModelViewSet):
 class VoteViewSet(viewsets.ModelViewSet):
     queryset = Partie.objects.all()
     serializer_class = VoteSerializer
+
+class PartieViewSet(viewsets.ModelViewSet):
+    queryset = Partie.objects.all()
+    serializer_class = PartieSerializer
+
+    def get_queryset(self):
+        queryset = Partie.objects.all()
+        id_session = self.request.query_params.get('id_session')
+        
+        if id_session is not None:
+            queryset = queryset.filter(id_session=id_session)
+        return queryset
