@@ -1,5 +1,4 @@
 import React from 'react';
-import '../assets/accueil.css'; 
 import { Container, TextField, Button, Typography, Box, Paper } from '@mui/material';
 
 const Accueil = () => {
@@ -30,15 +29,15 @@ const Accueil = () => {
     };
 
     return (
-        <Container maxWidth="sm" className="accueil-container">
-            <Paper elevation={8} className="accueil-card">
-                <Typography variant="h4" component="h1" className="accueil-title">
+        <Container maxWidth="sm" sx={{ paddingTop: '85px', minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Paper elevation={8} sx={{padding: 3, textAlign: 'center', height: 'fit-content', width: '70%'}}>
+                <Typography variant="h4" component="h1" sx={{ marginBottom: 0 }}>
                     Planning Poker
                 </Typography>
-                <Typography variant="body2" className="accueil-subtitle">
+                <Typography variant="body2" >
                     Entrez votre nom d'utilisateur pour continuer.
                 </Typography>
-                <Box component="form" onSubmit={handleSubmit} noValidate className="accueil-form">
+                <Box component="form" onSubmit={handleSubmit} noValidate >
                     <TextField
                         label="Nom d'utilisateur"
                         value={username}

@@ -1,19 +1,20 @@
+// src/pages/partie.jsx
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+import { useParams, useLocation, useNavigate } from 'react-router-dom'; // AJOUT useNavigate
 import { Container, Stack, Box, Typography, Chip, Divider } from '@mui/material';
 
 // Imports Logic & Services
 import { fetchSessionById, voteCard, fetchVotes } from '../services/api';
 import { getCardSet } from '../services/card';
 
-// Imports Composants (Ajuste le chemin si besoin)
+// Imports Composants
 import StoryDisplay from '../components/partie/StoryDisplay';
 import PlayersGrid from '../components/partie/PlayersGrid';
 import VotingDeck from '../components/partie/VotingDeck';
 
 export default function GameSession() {
-    // --- 1. HOOKS & STATE ---
     const { id_session } = useParams();
+    const navigate = useNavigate(); // Hook pour la redirection
     const location = useLocation();
     
     // Récupération user/mode
@@ -21,21 +22,30 @@ export default function GameSession() {
     const gameMode = queryParams.get('mode') || 'strict'; 
     const username = document.cookie.match(/(?:^|;\s*)username=([^;]+)/)?.[1] ? decodeURIComponent(document.cookie.match(/(?:^|;\s*)username=([^;]+)/)[1]) : "Anonyme";
 
-    const [currentStory, setCurrentStory] = useState(null); 
+    // --- NOUVEAUX ÉTATS ---
+    const [allStories, setAllStories] = useState([]); // Liste complète
+    const [storyIndex, setStoryIndex] = useState(0);  // Position actuelle
+    // ----------------------
+
     const [selectedCard, setSelectedCard] = useState(null); 
     const [votes, setVotes] = useState({}); 
     const [showVotes, setShowVotes] = useState(false); 
     const [loading, setLoading] = useState(true);
 
+    // Variable dérivée : la story actuelle dépend de l'index
+    const currentStory = allStories[storyIndex] || null;
     const cardSet = getCardSet(gameMode);
 
-    // --- 2. LOGIQUE (Polling & Fetch) ---
+    // --- LOGIQUE ---
+
     const fetchSessionData = useCallback(async () => {
         setLoading(true);
         try {
             const data = await fetchSessionById(id_session);
-            // Logique simplifiée : prend la 1ère story
-            setCurrentStory(data?.stories?.[0] || null);
+            // On stocke toutes les stories
+            if (data.stories && Array.isArray(data.stories)) {
+                setAllStories(data.stories);
+            }
         } catch (error) {
             console.error("Erreur session:", error);
         } finally {
@@ -61,6 +71,26 @@ export default function GameSession() {
         }
     };
 
+    // --- GESTION DU BOUTON SUIVANT ---
+    const handleNextStory = () => {
+        const nextIndex = storyIndex + 1;
+
+        // Est-ce qu'il reste des stories ?
+        if (nextIndex < allStories.length) {
+            // OUI : On passe à la suivante et on reset tout
+            setStoryIndex(nextIndex);
+            setShowVotes(false);
+            setSelectedCard(null);
+            setVotes({}); // On vide les votes visuellement (le back devrait gérer le reset réel)
+            
+            // TODO: Appeler une API backend ici pour dire "Passer à la story suivante" 
+            // pour synchroniser les autres joueurs
+        } else {
+            // NON : C'est fini -> Page de résultats
+            navigate(`/partie/${id_session}/resultats`);
+        }
+    };
+
     // Cycles de vie
     useEffect(() => {
         fetchSessionData();
@@ -68,35 +98,34 @@ export default function GameSession() {
         return () => clearInterval(intervalId);
     }, [fetchSessionData]);
 
-    // --- 3. HANDLERS ---
+    // Handlers
     const handleCardClick = (value) => {
         setSelectedCard(value);
         voteCard(id_session, username, value);
         refreshGameState();
     };
 
-    // --- 4. RENDER ---
     if (loading) return <Container sx={{ py: 6 }}><Typography align="center">Chargement...</Typography></Container>;
 
     return (
-        <Container maxWidth="lg" sx={{ height:"100%", width:"100%", paddingTop: '85px' }}>
-            <Stack spacing={2}>
-                {/* En-tête simple */}
+        <Container maxWidth="lg" sx={{ height:"90%", width:"100%", paddingTop: '80px' }}>
+            <Stack spacing={4}>
                 <Box>
                     <Typography variant="h5" fontWeight={700}>
                         Session : {id_session} 
                         <Chip label={gameMode} color="secondary" size="small" sx={{ ml: 2 }} />
+                        <Chip label={`${storyIndex + 1} / ${allStories.length}`} size="small" sx={{ ml: 1 }} />
                     </Typography>
                 </Box>
                 <Divider />
 
-                {/* ZONE 1 : STORY */}
+                {/* ZONE 1 : STORY (avec la nouvelle prop onNext) */}
                 <StoryDisplay 
                     currentStory={currentStory} 
                     showVotes={showVotes} 
-                    onReveal={() => setShowVotes(true)} 
+                    onReveal={() => setShowVotes(true)}
+                    onNext={handleNextStory} 
                 />
-                <Divider />
 
                 {/* ZONE 2 : JOUEURS */}
                 <PlayersGrid 
