@@ -135,3 +135,18 @@ export const endStory = async (id_session) => {
     throw error;
   }
 };
+
+export const closeStory = async (id_session, storyIndex) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/sessions/${id_session}/close_story/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ story_index: storyIndex }),
+    });
+    if (!response.ok) throw new Error('Erreur fermeture story');
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur closeStory:", error);
+    throw error;
+  }
+};

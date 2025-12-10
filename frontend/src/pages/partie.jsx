@@ -4,7 +4,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom'; // AJOUT
 import { Container, Stack, Box, Typography, Chip, Divider } from '@mui/material';
 
 // Imports Logic & Services
-import { fetchSessionById, voteCard, fetchVotes } from '../services/api';
+import { fetchSessionById, voteCard, fetchVotes, closeStory } from '../services/api';
 import { getCardSet } from '../services/card';
 
 // Imports Composants
@@ -72,22 +72,22 @@ export default function GameSession() {
     };
 
     // --- GESTION DU BOUTON SUIVANT ---
-    const handleNextStory = () => {
-        const nextIndex = storyIndex + 1;
-
-        // Est-ce qu'il reste des stories ?
-        if (nextIndex < allStories.length) {
-            // OUI : On passe à la suivante et on reset tout
-            setStoryIndex(nextIndex);
-            setShowVotes(false);
-            setSelectedCard(null);
-            setVotes({}); // On vide les votes visuellement (le back devrait gérer le reset réel)
+    const handleNextStory = async () => {
+        // APPEL AU BACK POUR SAUVEGARDER LE RÉSULTAT
+        try {
+            await closeStory(id_session, storyIndex);
             
-            // TODO: Appeler une API backend ici pour dire "Passer à la story suivante" 
-            // pour synchroniser les autres joueurs
-        } else {
-            // NON : C'est fini -> Page de résultats
-            navigate(`/partie/${id_session}/resultats`);
+            const nextIndex = storyIndex + 1;
+            if (nextIndex < allStories.length) {
+                setStoryIndex(nextIndex);
+                setShowVotes(false);
+                setSelectedCard(null);
+                setVotes({});
+            } else {
+                navigate(`/partie/${id_session}/resultats`);
+            }
+        } catch (err) {
+            console.error("Impossible de sauvegarder la story", err);
         }
     };
 
@@ -99,9 +99,9 @@ export default function GameSession() {
     }, [fetchSessionData]);
 
     // Handlers
-    const handleCardClick = (value) => {
+    const handleCardClick = async (value) => {
         setSelectedCard(value);
-        voteCard(id_session, username, value);
+        await voteCard(id_session, username, value);
         refreshGameState();
     };
 
