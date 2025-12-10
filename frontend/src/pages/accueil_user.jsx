@@ -25,7 +25,6 @@ const componentStyles = {
     }
 };
 
-
 // --- LOGIQUE DU COMPOSANT ---
 
 export default function AccueilUser() {
@@ -77,11 +76,6 @@ export default function AccueilUser() {
     }
     setJoinCode('');
   };
-
-
-
-
-
   
  // Charge les sessions au montage du composant (grace au fetchSessions plus haut)
   useEffect(() => {
@@ -101,7 +95,7 @@ export default function AccueilUser() {
   // --- RENDER DU COMPOSANT ---
   return (
     
-    <Container maxWidth="md" sx={{ py: 6 }}>
+    <Container maxWidth="md" sx={{ py: 6, paddingTop: '85px' }}>
       <Stack spacing={4}>
         <Box sx={componentStyles.headerBox}>
           <Typography variant="h4" fontWeight={600}>
@@ -122,7 +116,6 @@ export default function AccueilUser() {
                   label="Code session"
                   value={joinCode}
                   onChange={e => setJoinCode(e.target.value.toUpperCase())}
-                  inputProps={{ maxLength: 10, style: { letterSpacing: 2 } }}
                   sx={{ flex: 1 }}
                 />
                 <Button

@@ -74,7 +74,6 @@ export const createSession = async (titre, stories = [], mode_de_jeu) => {
     }
 };
 
-
 // Récupérer une seule session par son ID
 export const fetchSessionById = async (id_session) => {
   try {
@@ -90,11 +89,7 @@ export const fetchSessionById = async (id_session) => {
   }
 };
 
-
-
 // API de la partie (voter, récupérer les votes, etc.) avec axios ou pas 
-
-
 export const voteCard = async (id_session, username, carte_choisie) => {
   try {
     const response = await axios.post('/api/vote/', { id_session, username, carte_choisie });
@@ -105,17 +100,21 @@ export const voteCard = async (id_session, username, carte_choisie) => {
   } 
 };
 
-
+// Récupérer les votes pour une session donnée
 export const fetchVotes = async (id_session) => {
   try {
-    const response = await axios.get('/api/votes/', { params: { id_session } });
+    // On appelle l'endpoint 'parties' avec le filtre id_session
+    const response = await axios.get(`${API_BASE_URL}/parties/`, { 
+        params: { id_session: id_session } 
+    });
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la récupération des votes:", error);
-    throw error;
+    return []; // Retourne un tableau vide en cas d'erreur pour ne pas casser le front
   }
 };
 
+// Vérifier si tous les utilisateurs ont voté
 export const checkAllVoted = async (id_session) => {
   try {
     const response = await axios.get('/api/check_all_voted/', { params: { id_session } });
@@ -125,12 +124,33 @@ export const checkAllVoted = async (id_session) => {
     throw error;
   }
 };
+
+// Mettre fin à une story
 export const endStory = async (id_session) => {
   try {
     const response = await axios.post('/api/end_story/', { id_session });
     return response.data;
   } catch (error) {
     console.error("Erreur lors de la fin de l'histoire:", error);
+    throw error;
+  }
+};
+
+// src/services/api.js
+export const closeStory = async (id_session, storyIndex, finalValue) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/sessions/${id_session}/close_story/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+          story_index: storyIndex,
+          final_value: finalValue // <--- Envoi au back
+      }),
+    });
+    if (!response.ok) throw new Error('Erreur fermeture story');
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur closeStory:", error);
     throw error;
   }
 };

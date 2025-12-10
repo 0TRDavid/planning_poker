@@ -6,6 +6,7 @@ import Accueil from './pages/accueil.jsx'
 import AccueilUser from './pages/accueil_user.jsx'
 import Creation_session from './pages/creation_session.jsx'
 import GameSession from './pages/partie.jsx';
+import Resultats from './pages/resultat.jsx';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/accueiluser" element={<AccueilUser />} />
         <Route path="/create-session" element={<Creation_session />} />
         <Route path="/partie/:id_session" element={<GameSession />} />
+        <Route path="/partie/:id_session/resultats" element={<Resultats />} />
 
       </Routes>
     </BrowserRouter>

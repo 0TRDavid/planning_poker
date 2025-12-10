@@ -4,8 +4,6 @@ import json
 
 # WEBSOCKET non utilisé pour l'instant mais à garder pour une évolution future en temps réel
 
-
-
 class SessionConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         self.session_id = self.scope['url_route']['kwargs']['session_id']
