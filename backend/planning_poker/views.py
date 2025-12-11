@@ -1,8 +1,8 @@
 from rest_framework import viewsets, status
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from .models import Session, Partie
-from .serializers import SessionSerializer, PartieSerializer, JoinPartieSerializer, VoteSerializer
+from .serializers import SessionSerializer, PartieSerializer #, JoinPartieSerializer
 
 class SessionViewSet(viewsets.ModelViewSet):
     queryset = Session.objects.all()
@@ -41,13 +41,15 @@ class SessionViewSet(viewsets.ModelViewSet):
         
         return Response({'error': 'Index invalide'}, status=status.HTTP_400_BAD_REQUEST)
     
-class JoinPartieViewSet(viewsets.ModelViewSet):
-    queryset = Partie.objects.all()
-    serializer_class = JoinPartieSerializer
+    @action(detail=True, methods=['post'])
+    def close_session(self, request, pk=None):
+        session = self.get_object()
+        if request.data.get('status') == 'closed':
+            session.status = 'closed' # Evite la saisie directe depuis le frontend
+            session.save()
+            return Response({'status': 'Session fermée'})
+        return Response({'error': 'Statut invalide'}, status=status.HTTP_400_BAD_REQUEST)
 
-class VoteViewSet(viewsets.ModelViewSet):
-    queryset = Partie.objects.all()
-    serializer_class = VoteSerializer
 
 class PartieViewSet(viewsets.ModelViewSet):
     queryset = Partie.objects.all()
@@ -58,3 +60,41 @@ class PartieViewSet(viewsets.ModelViewSet):
         qs = super().get_queryset()
         session_id = self.request.query_params.get('id_session')
         return qs.filter(id_session=session_id) if session_id else qs
+    
+    @action(detail=False, methods=['post'])
+    def fin_partie(self, request):
+        username = request.data.get('username')
+        id_session = request.data.get('id_session')
+        partie = Partie.objects.filter(username=username, id_session=id_session).first()
+        if not username or not id_session:
+            return Response({'error': 'Paramètres manquants'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if not partie:
+            return Response({'error': 'Partie introuvable'}, status=status.HTTP_404_NOT_FOUND)
+
+        partie.delete()
+        return Response({'status': 'Joueur supprimé de la session'}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'])
+    def join_partie(self, request):
+        username = request.data.get('username')
+        id_session = request.data.get('id_session')
+
+        if not username or not id_session:
+            return Response({'error': 'Paramètres manquants'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            session = Session.objects.get(pk=id_session)
+            if session.status == 'closed':
+                return Response({'status': 'closed'}, status=status.HTTP_200_OK)
+
+            partie, created = Partie.objects.get_or_create(username=username, id_session=session)
+            serializer = PartieSerializer(partie)
+            return Response(serializer.data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
+
+        except Session.DoesNotExist:
+            return Response({'error': 'Session introuvable'}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        # Si le temps on peut ajouter dans la creation de la session un nb de participant max 
+        # et ici vérifier le nombre de participants avant d'autoriser l'ajout sinon message dans le foront

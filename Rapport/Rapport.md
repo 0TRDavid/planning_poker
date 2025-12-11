@@ -39,3 +39,6 @@ Une table partie dans le back qui recois lorsque l'utilisateur rejoins la sessio
 
 
  Si une session est pleine, empecher de la rejoindre ou page de dl ! par contre on ne peut le faire qu'une seule fois !! vider table partie a l'ouverture re resultat ?!  
+
+Ajouter un bouton pour la pause cafe, ce qui revient a l'accueil en supprimant les joueurs !! la partie est save!
+ajouter un nombvre de participant à la création!

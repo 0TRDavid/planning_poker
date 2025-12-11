@@ -4,7 +4,7 @@ import { useParams, useLocation, useNavigate } from 'react-router-dom'; // AJOUT
 import { Container, Stack, Box, Typography, Chip, Divider } from '@mui/material';
 
 // Imports Logic & Services
-import { fetchSessionById, voteCard, fetchVotes, closeStory } from '../services/api';
+import { fetchSessionById, fetchVotes, closeStory, finPartie } from '../services/api';
 import { getCardSet } from '../services/card';
 
 // Imports Composants
@@ -85,6 +85,7 @@ export default function GameSession() {
                 setSelectedCard(null); // <-- Le reset se fait ici, APRES l'envoi
                 setVotes({});
             } else {
+                await finPartie(id_session, username);
                 navigate(`/partie/${id_session}/resultats`);
             }
         } catch (err) {
