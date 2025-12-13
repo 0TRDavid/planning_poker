@@ -133,8 +133,7 @@ export const closeStory = async (id_session, storyIndex, finalValue) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-          story_index: storyIndex,
-          final_value: finalValue // <--- Envoi au back
+          story_index: storyIndex
       }),
     });
     if (!response.ok) throw new Error('Erreur fermeture story');
@@ -170,3 +169,32 @@ export const finPartie = async (id_session, username) => {
   }
 };
 
+export const voteCard = async (id_session, username, carte_choisie) => {
+  try {
+    const response = await fetch('/api/parties/vote_card/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_session, username, carte_choisie }),
+    });
+    if (!response.ok) throw new Error('Erreur vote carte');
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur voteCard:", error);
+    throw error;
+  }
+};
+
+export const razVote = async (id_session, username) => {
+  try {
+    const response = await fetch('/api/parties/raz_vote/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_session, username }),
+    });
+    if (!response.ok) throw new Error('Erreur raz vote');
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur razVote:", error);
+    throw error;
+  }
+};
