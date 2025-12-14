@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 from planning_poker import views
 
 router = DefaultRouter()
-router.register(r'sessions', views.SessionViewSet)
+router.register(r'sessions', views.SessionViewSet, basename='session')
 router.register(r'parties', views.PartieViewSet, basename='partie')
 
 urlpatterns = [

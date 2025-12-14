@@ -11,23 +11,62 @@ class SessionViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'])
     def close_story(self, request, pk=None): # lA fonction est appelé une fois par chaque joueur... 
         # On peut vérifier si la valeur est déja set et n'est pas cafe ou ? remvoyer comme deja set ?
+
+        # 'strict'
+        # 'median'
+        # 'average'
+        # 'majority_abs'
+        # 'majority_rel'
+        modes_de_calcul = ['strict', 'median', 'average', 'majority_abs', 'majority_rel']
         session = self.get_object()
-        
         story_index = request.data.get('story_index')
 
         if story_index is None or not isinstance(story_index, int):
             return Response({'error': 'Index manquant'}, status=status.HTTP_400_BAD_REQUEST)
 
         else:
-            # SINON : Calcul automatique de la moyenne (fallback)
+            mode_de_calcul = session.mode_de_jeu if session.mode_de_jeu in modes_de_calcul else 'average' # On recupere le mode de calcul de la session
+            resultat_final = 0
             votes = Partie.objects.filter(id_session=session)
-            valeurs = [int(v.carte_choisie) for v in votes if v.carte_choisie and v.carte_choisie.isdigit()]
-            resultat_final = round(sum(valeurs) / len(valeurs)) if valeurs else 0
-
-        # Mise à jour du JSON
+            if votes.count() == 0:
+                return Response({'error': 'Aucun vote trouvé'}, status=status.HTTP_400_BAD_REQUEST)
+                    # Mise à jour du JSON
         stories = list(session.stories)
         if 0 <= story_index < len(stories):
-            stories[story_index]['valeur_finale'] = str(resultat_final)
+        
+            if mode_de_calcul == 'strict':
+                cartes_choisies = [v.carte_choisie for v in votes if v.carte_choisie]
+                if len(set(cartes_choisies)) == 1 and cartes_choisies:
+                    resultat_final = int(cartes_choisies[0])
+                else:
+                    resultat_final = -1  # Indique un désaccord entre les joueurs, on ne peut pas close la story, a gerer dans le front
+            
+
+            elif mode_de_calcul == 'median':
+                valeurs = sorted([int(v.carte_choisie) for v in votes if v.carte_choisie and v.carte_choisie.isdigit()])
+                n = len(valeurs)
+                if n % 2 == 1:
+                    resultat_final = valeurs[n // 2]
+                else:
+                    resultat_final = round((valeurs[n // 2 - 1] + valeurs[n // 2]) / 2)
+            elif mode_de_calcul == 'average':
+                valeurs = [int(v.carte_choisie) for v in votes if v.carte_choisie and v.carte_choisie.isdigit()]
+                resultat_final = round(sum(valeurs) / len(valeurs)) if valeurs else 0
+            elif mode_de_calcul == 'majority_abs':
+                from collections import Counter
+                cartes = [v.carte_choisie for v in votes if v.carte_choisie]
+                if cartes:
+                    most_common = Counter(cartes).most_common(1)[0]
+                    resultat_final = int(most_common[0]) if most_common[1] > len(cartes) / 2 else -1
+
+            elif mode_de_calcul == 'majority_rel':
+                from collections import Counter
+                cartes = [v.carte_choisie for v in votes if v.carte_choisie]
+                if cartes:
+                    most_common = Counter(cartes).most_common(1)[0]
+                    resultat_final = int(most_common[0])
+
+            stories[story_index]['valeur_finale'] = str(resultat_final) # On stocke en string pour gérer les cafés, -1 et ?
             session.stories = stories
             session.save()
             
@@ -35,9 +74,12 @@ class SessionViewSet(viewsets.ModelViewSet):
            # Partie.objects.filter(id_session=session).update(carte_choisie=None, a_vote=False)
             
             return Response({'status': 'Validé', 'valeur_finale': resultat_final})
-        
-        return Response({'error': 'Index invalide'}, status=status.HTTP_400_BAD_REQUEST)
-    
+        else:
+            return Response({'error': 'Index invalide'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
     @action(detail=True, methods=['post'])
     def close_session(self, request, pk=None):
         session = self.get_object()
@@ -94,6 +136,7 @@ class PartieViewSet(viewsets.ModelViewSet):
     def join_partie(self, request):
         username = request.data.get('username')
         id_session = request.data.get('id_session')
+        created = False
         if not username or not id_session:
             return Response({'error': 'Paramètres manquants'}, status=status.HTTP_400_BAD_REQUEST)
         try:
@@ -109,6 +152,7 @@ class PartieViewSet(viewsets.ModelViewSet):
                 'mode_de_jeu': mode_de_jeu,
                 'status': statut,
             }
+            
             return Response(return_data, status=status.HTTP_201_CREATED if created else status.HTTP_200_OK)
 
         except Session.DoesNotExist:
@@ -123,6 +167,8 @@ class PartieViewSet(viewsets.ModelViewSet):
         if not id_session:
             return Response({'error': 'Paramètres manquants'}, status=status.HTTP_400_BAD_REQUEST)
         try:
+            # On vérifie que la session existe
+            Session.objects.get(pk=id_session)
             Partie.objects.filter(id_session=id_session).update(carte_choisie=None, a_vote=False)
             return Response({'status': 'Vote réinitialisé'}, status=status.HTTP_200_OK)
         except Session.DoesNotExist:

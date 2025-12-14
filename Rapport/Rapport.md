@@ -42,3 +42,10 @@ Une table partie dans le back qui recois lorsque l'utilisateur rejoins la sessio
 
 Ajouter un bouton pour la pause cafe, ce qui revient a l'accueil en supprimant les joueurs !! la partie est save!
 ajouter un nombvre de participant à la création!
+
+Il faut :
+
+creer les tests front
+commenter auto le code
+tester les modes de jeu... fait avec les tests ?
+gerer la pause café! et le ? + la boucle front si strict et retour -1 de closestory!
