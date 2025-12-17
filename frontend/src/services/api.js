@@ -104,30 +104,30 @@ export const fetchVotes = async (id_session) => {
   }
 };
 
-// Vérifier si tous les utilisateurs ont voté
-export const checkAllVoted = async (id_session) => {
-  try {
-    const response = await axios.get('/api/check_all_voted/', { params: { id_session } });
-    return response.data.all_voted;
-  } catch (error) {
-    console.error("Erreur lors de la vérification des votes:", error);
-    throw error;
-  }
-};
+// // Vérifier si tous les utilisateurs ont voté
+// export const checkAllVoted = async (id_session) => {
+//   try {
+//     const response = await axios.get('/api/check_all_voted/', { params: { id_session } });
+//     return response.data.all_voted;
+//   } catch (error) {
+//     console.error("Erreur lors de la vérification des votes:", error);
+//     throw error;
+//   }
+// };
 
-// Mettre fin à une story
-export const endStory = async (id_session) => {
-  try {
-    const response = await axios.post('/api/end_story/', { id_session });
-    return response.data;
-  } catch (error) {
-    console.error("Erreur lors de la fin de l'histoire:", error);
-    throw error;
-  }
-};
+// // Mettre fin à une story
+// export const endStory = async (id_session) => {
+//   try {
+//     const response = await axios.post('/api/end_story/', { id_session });
+//     return response.data;
+//   } catch (error) {
+//     console.error("Erreur lors de la fin de l'histoire:", error);
+//     throw error;
+//   }
+// };
 
 // src/services/api.js
-export const closeStory = async (id_session, storyIndex, finalValue) => {
+export const closeStory = async (id_session, storyIndex) => {
   try {
     const response = await fetch(`${API_BASE_URL}/sessions/${id_session}/close_story/`, {
       method: 'POST',
