@@ -5,16 +5,9 @@ from planning_poker import views
 
 router = DefaultRouter()
 router.register(r'sessions', views.SessionViewSet)
-router.register(r'joinPartie', views.JoinPartieViewSet, basename='joinPartie')
 router.register(r'parties', views.PartieViewSet, basename='partie')
-router.register(r'vote', views.VoteViewSet, basename='vote')
-
-# Dans urls.py, affiche tous les basenames enregistrés
-"""print("Basenames enregistrés:")
-for prefix, viewset, basename in router.registry:
-    print(f"  - {prefix:20} → {basename}")"""
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path('api/', include(router.urls)),
+    path('api/', include(router.urls)),  # Utilisation de la vue join_partie
 ]

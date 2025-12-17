@@ -1,10 +1,10 @@
 // src/pages/partie.jsx
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom'; // AJOUT useNavigate
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useLocation, useNavigate, data } from 'react-router-dom'; // AJOUT useNavigate
 import { Container, Stack, Box, Typography, Chip, Divider } from '@mui/material';
 
 // Imports Logic & Services
-import { fetchSessionById, voteCard, fetchVotes, closeStory } from '../services/api';
+import { fetchSessionById, fetchVotes, closeStory, finPartie, voteCard, razVote } from '../services/api';
 import { getCardSet } from '../services/card';
 
 // Imports Composants
@@ -12,10 +12,11 @@ import StoryDisplay from '../components/partie/StoryDisplay';
 import PlayersGrid from '../components/partie/PlayersGrid';
 import VotingDeck from '../components/partie/VotingDeck';
 
+
 export default function GameSession() {
-    const { id_session } = useParams();
+    const { id_session } = useParams(); // Récupération de l'ID de session depuis l'URL
     const navigate = useNavigate(); // Hook pour la redirection
-    const location = useLocation();
+    //const location = useLocation(); 
     
     // Récupération user/mode
     const queryParams = new URLSearchParams(location.search);
@@ -25,17 +26,19 @@ export default function GameSession() {
     // --- NOUVEAUX ÉTATS ---
     const [allStories, setAllStories] = useState([]); // Liste complète
     const [storyIndex, setStoryIndex] = useState(0);  // Position actuelle
+    // const [isAllVoted, setIsAllVoted] = useState(false); // Indique si tous les joueurs ont voté
+    // const [storyClosed, setStoryClosed] = useState(0); // Indique si la story a été fermée
+    const storyClosedRef = useRef(0);
     // ----------------------
 
     const [selectedCard, setSelectedCard] = useState(null); 
     const [votes, setVotes] = useState({}); 
     const [showVotes, setShowVotes] = useState(false); 
     const [loading, setLoading] = useState(true);
-
     // Variable dérivée : la story actuelle dépend de l'index
     const currentStory = allStories[storyIndex] || null;
     const cardSet = getCardSet(gameMode);
-
+    
     // --- LOGIQUE ---
 
     const fetchSessionData = useCallback(async () => {
@@ -53,29 +56,49 @@ export default function GameSession() {
         }
     }, [id_session]);
 
+
+
     const refreshGameState = async () => {
         if (!id_session) return;
         try {
+            // Récupérer les votes actuels
             const dataPartie = await fetchVotes(id_session);
             const votesMap = {};
             if (Array.isArray(dataPartie)) {
                 dataPartie.forEach(player => {
                     if (player.username !== username) {
-                        votesMap[player.username] = player.carte_choisie; 
+                        votesMap[player.username] = player.carte_choisie;
                     }
+            
                 });
             }
             setVotes(votesMap);
+            let isAllVoted = dataPartie.every(player => player.a_vote === true);
+             // On ne set qu'une seule fois par story
+
+    if (isAllVoted) {
+        setShowVotes(true); // Si tout le monde a voté on affiche 
+    if (isAllVoted && storyClosedRef.current === storyIndex) { // On ne rentre qu'une fois dans cette condition
+                // Envoyter la totaloté
+        closeStory(id_session, storyIndex); // Le back fait le calcul des valeurs finales
+        // avec le mode de jeu défini !
+        storyClosedRef.current = storyIndex +1;
+    }
+
+    }
+
+
+        
         } catch (error) {
             console.error("Erreur polling:", error);
         }
+
     };
 
     // --- GESTION DU BOUTON SUIVANT ---
     const handleNextStory = async () => {
         try {
-            await closeStory(id_session, storyIndex, selectedCard); 
-            
+            await razVote(id_session);
             const nextIndex = storyIndex + 1;
             
             // ENSUITE on nettoie l'interface pour le tour suivant
@@ -85,6 +108,7 @@ export default function GameSession() {
                 setSelectedCard(null); // <-- Le reset se fait ici, APRES l'envoi
                 setVotes({});
             } else {
+                await finPartie(id_session, username);
                 navigate(`/partie/${id_session}/resultats`);
             }
         } catch (err) {
@@ -92,17 +116,17 @@ export default function GameSession() {
         }
     };
 
-    // Cycles de vie
+    // Cycles de vie Chargé au demarrage et polling toutes les 2s
     useEffect(() => {
-        fetchSessionData();
-        const intervalId = setInterval(refreshGameState, 2000);
-        return () => clearInterval(intervalId);
+        fetchSessionData(); // charge les données initiales 1 fois
+        const intervalId = setInterval(refreshGameState, 2000); // polling toutes les 2s
+        return () => clearInterval(intervalId); // cleanup au démontage
     }, [fetchSessionData]);
 
     // Handlers
     const handleCardClick = async (value) => {
         setSelectedCard(value);
-        //await voteCard(id_session, username, value);
+        await voteCard(id_session, username, value);
         refreshGameState();
     };
 
@@ -124,7 +148,7 @@ export default function GameSession() {
                 <StoryDisplay 
                     currentStory={currentStory} 
                     showVotes={showVotes} 
-                    onReveal={() => setShowVotes(true)}
+                    //onReveal={() => setShowVotes(true)}
                     onNext={handleNextStory} 
                 />
 
@@ -137,7 +161,6 @@ export default function GameSession() {
                 />
                 
                 <Divider />
-
                 {/* ZONE 3 : DECK */}
                 <VotingDeck 
                     cardSet={cardSet} 

@@ -74,7 +74,8 @@ export default function AccueilUser() {
           window.location.href = `/partie/${joinCode}/resultats`;
           return; // si tu mets pas de return ici, il continue et ouvre la page partie...
         } else {
-          window.location.href = `/partie/${joinCode}`;
+          const gameMode = res?.mode_de_jeu || 'strict';
+          window.location.href = `/partie/${joinCode}?mode=${gameMode}`; // + gamemode !!
         }
         // Ouvre la page partie
       //window.location.href = `/partie/${joinCode}`;

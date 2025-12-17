@@ -18,6 +18,10 @@ export default function StoryDisplay({ currentStory, showVotes, onReveal, onNext
                 </Typography>
                 
                 <Stack direction="row" spacing={2} justifyContent="center" mt={3}>
+
+
+                    {/* On eleve le bouton Reveal pour l'instant, on gere le reveal quand tout le monde a voté
+                    
                     <Button 
                         variant="contained" 
                         color={showVotes ? "error" : "primary"}
@@ -27,7 +31,9 @@ export default function StoryDisplay({ currentStory, showVotes, onReveal, onNext
                     >
                         {showVotes ? "Votes Révélés" : "Révéler les votes"}
                     </Button>
-                    
+                     */}
+
+                     
                     {/* Le bouton Next apparaît uniquement quand les votes sont révélés */}
                     {showVotes && (
                         <Button 

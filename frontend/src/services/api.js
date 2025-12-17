@@ -27,7 +27,7 @@ export const fetchSessions = async () => {
 
 export const joinPartie = async (id_session, username) => {
   
-          const res = await fetch('/api/joinPartie/', {
+          const res = await fetch('/api/parties/join_partie/', {
             method: 'POST',
             
             headers: { 'Content-Type': 'application/json' },
@@ -89,16 +89,6 @@ export const fetchSessionById = async (id_session) => {
   }
 };
 
-// API de la partie (voter, récupérer les votes, etc.) avec axios ou pas 
-export const voteCard = async (id_session, username, carte_choisie) => {
-  try {
-    const response = await axios.post('/api/vote/', { id_session, username, carte_choisie });
-    return response.data;
-  } catch (error) {
-    console.error("Erreur lors du vote:", error);
-    throw error;
-  } 
-};
 
 // Récupérer les votes pour une session donnée
 export const fetchVotes = async (id_session) => {
@@ -143,14 +133,68 @@ export const closeStory = async (id_session, storyIndex, finalValue) => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
-          story_index: storyIndex,
-          final_value: finalValue // <--- Envoi au back
+          story_index: storyIndex
       }),
     });
     if (!response.ok) throw new Error('Erreur fermeture story');
     return await response.json();
   } catch (error) {
     console.error("Erreur closeStory:", error);
+    throw error;
+  }
+};
+
+export const finPartie = async (id_session, username) => {
+  try {
+    const finishRes = await fetch(`${API_BASE_URL}/sessions/${id_session}/close_session/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: "closed" }),
+    });
+    if (!finishRes.ok) throw new Error('Erreur fin partie');
+    const finishData = await finishRes.json();
+
+    const deleteRes = await fetch('/api/parties/fin_partie/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_session, username }),
+    });
+    if (!deleteRes.ok) throw new Error('Erreur suppression partie');
+    const deleteData = await deleteRes.json().catch(() => null);
+
+    return { finish: finishData, delete: deleteData };
+  } catch (error) {
+    console.error("Erreur finPartie:", error);
+    throw error;
+  }
+};
+
+export const voteCard = async (id_session, username, carte_choisie) => {
+  try {
+    const response = await fetch('/api/parties/vote_card/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_session, username, carte_choisie }),
+    });
+    if (!response.ok) throw new Error('Erreur vote carte');
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur voteCard:", error);
+    throw error;
+  }
+};
+
+export const razVote = async (id_session, username) => {
+  try {
+    const response = await fetch('/api/parties/raz_vote/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id_session, username }),
+    });
+    if (!response.ok) throw new Error('Erreur raz vote');
+    return await response.json();
+  } catch (error) {
+    console.error("Erreur razVote:", error);
     throw error;
   }
 };
