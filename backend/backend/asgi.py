@@ -1,10 +1,8 @@
-"""
-ASGI config for backend project.
+"""!
+@brief Point d'entrée ASGI pour les serveurs web asynchrones (Uvicorn, Daphne).
 
-It exposes the ASGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/asgi/
+Permet de gérer des connexions asynchrones (WebSockets) si nécessaire dans le futur.
+Expose l'application callable `application`.
 """
 
 import os

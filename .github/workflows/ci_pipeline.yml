@@ -1,50 +1,99 @@
-# .github/workflows/ci_pipeline.yml
+name: CI/CD Pipeline & Documentation
 
-name: CI Pipeline (Django & React)
-
-# Déclencheur
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-  
-# --- JOBS (Tâches) ---
+
+# Permissions nécessaires pour déployer la doc sur GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
 jobs:
-  # 1. Tâche pour le Backend (Tests Django avec Docker Compose)
-  backend_test:
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-      
-      - name : Install Docker Compose
-        run: sudo apt install -y docker-compose
-
-      - name: Build and Start ONLY Backend Service
-        run: docker-compose up --build -d backend
-
-      - name: Wait for services to be ready
-        run: sleep 10
-        
-  # --- 2. Tâche pour le Frontend (Tests React/Vite) ---
-  frontend_test:
-    needs: backend_test
+  # ------------------------------------------------------------------
+  # JOB 1 : BACKEND (Tests Python)
+  # ------------------------------------------------------------------
+  backend-tests:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Code
+      - name: Récupération du code
         uses: actions/checkout@v4
 
-      - name: Set up Node.js Environment
+      - name: Installation de Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip' 
+
+      - name: Installation des dépendances
+        working-directory: ./backend
+        run: 
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Lancement des tests (Pytest)
+        working-directory: ./backend
+        env:
+          SECRET_KEY: 'test'
+          DEBUG: 'True'
+        run: pytest
+
+  # ------------------------------------------------------------------
+  # JOB 2 : FRONTEND (Build & Lint)
+  # ------------------------------------------------------------------
+  frontend-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation de Node.js 22
         uses: actions/setup-node@v4
         with:
-          node-version: '20' 
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
 
-      - name: Install Frontend Dependencies
-        run: npm install
-        working-directory: ./frontend 
-
-      - name: Run Frontend 
-        run: npm run dev
+      - name: Installation des paquets
         working-directory: ./frontend
+        run: npm ci 
+
+      - name: Vérification du code (Lint)
+        working-directory: ./frontend
+        run: npm run lint
+
+  # ------------------------------------------------------------------
+  # JOB 3 : DOCUMENTATION (Doxygen -> GitHub Pages)
+  # ------------------------------------------------------------------
+  generate-docs:
+    needs: [backend-tests, frontend-build]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Récupération du code
+        uses: actions/checkout@v4
+
+      - name: Installation des outils (Doxygen + Graphviz)
+        run: 
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Génération de la documentation
+        working-directory: ./backend
+        run: doxygen Doxyfile
+
+      - name: Préparation de l'artefact (Upload)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'backend/docs/html'
+
+      - name: Déploiement sur GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -6,10 +6,20 @@ from tests.factories import SessionFactory, PartieFactory
 
 @pytest.mark.django_db
 class TestSession:
-    """Tests pour le modèle Session"""
+    """!
+    @brief Suite de tests pour le modèle `Session`.
+    
+    Vérifie l'intégrité des données, la génération automatique des ID,
+    les valeurs par défaut et le stockage du JSON.
+    """
     
     def test_session_creation(self):
-        """Test la création d'une session"""
+        """!
+        @brief Vérifie la création basique d'une session.
+        
+        S'assure que les champs principaux (titre, mode de jeu) sont bien
+        enregistrés et que les valeurs par défaut (status) sont appliquées.
+        """
         session = SessionFactory(titre='Mon Planning', mode_de_jeu='strict')
         assert session.titre == 'Mon Planning'
         assert session.mode_de_jeu == 'strict'
@@ -17,38 +27,62 @@ class TestSession:
         assert session.id_session is not None
     
     def test_session_id_is_six_digits(self):
-        """Test que l'id_session est un code à 6 chiffres"""
+        """!
+        @brief Vérifie le format de l'ID de session.
+        
+        L'ID doit être une chaîne numérique de exactement 6 caractères.
+        """
         session = SessionFactory()
         assert len(session.id_session) == 6
         assert session.id_session.isdigit()
     
     def test_session_id_is_unique(self):
-        """Test que l'id_session est unique"""
+        """!
+        @brief Vérifie l'unicité des IDs de session.
+        
+        Bien que théoriquement improbable, factory_boy doit générer
+        des sessions distinctes.
+        """
         session1 = SessionFactory()
         # Créer une autre session avec un id_session différent
         session2 = SessionFactory()
         assert session1.id_session != session2.id_session
     
     def test_session_str(self):
-        """Test la représentation string de Session"""
+        """!
+        @brief Vérifie la méthode `__str__` du modèle Session.
+        
+        Le format attendu est "Titre (ID - Mode)".
+        """
         session = SessionFactory(titre='Sprint 1', mode_de_jeu='strict')
         expected = f"Sprint 1 ({session.id_session} - strict)"
         assert str(session) == expected
     
     def test_session_default_status(self):
-        """Test le statut par défaut"""
+        """!
+        @brief Vérifie que le statut par défaut est bien 'open'.
+        """
         session = SessionFactory()
         assert session.status == 'open'
     
     def test_session_status_values(self):
-        """Test les différentes valeurs de statut"""
+        """!
+        @brief Vérifie que le champ status accepte les valeurs attendues.
+        
+        Valeurs testées : 'open', 'in_progress', 'closed'.
+        """
         statuses = ['open', 'in_progress', 'closed']
         for status in statuses:
             session = SessionFactory(status=status)
             assert session.status == status
     
     def test_session_stories_json(self):
-        """Test le champ stories JSON"""
+        """!
+        @brief Vérifie la persistance du champ JSONField `stories`.
+        
+        S'assure que les dictionnaires Python sont correctement sérialisés
+        et récupérés depuis la base de données.
+        """
         stories = {
             "story1": "Développer API",
             "story2": "Faire tests",
@@ -61,10 +95,17 @@ class TestSession:
 
 @pytest.mark.django_db
 class TestPartie:
-    """Tests pour le modèle Partie"""
+    """!
+    @brief Suite de tests pour le modèle `Partie` (Joueur).
+    
+    Vérifie les liens avec la Session, les contraintes d'unicité (unique_together)
+    et le comportement lors de la suppression.
+    """
     
     def test_partie_creation(self):
-        """Test la création d'une partie"""
+        """!
+        @brief Vérifie la création d'un joueur rattaché à une session.
+        """
         session = SessionFactory()
         partie = PartieFactory(username='Alice', id_session=session, carte_choisie=None)
         assert partie.username == 'Alice'
@@ -73,14 +114,18 @@ class TestPartie:
         assert partie.carte_choisie is None
     
     def test_partie_str(self):
-        """Test la représentation string de Partie"""
+        """!
+        @brief Vérifie la représentation textuelle d'une Partie.
+        """
         session = SessionFactory()
         partie = PartieFactory(username='Bob', id_session=session)
         expected = f"Bob in session {session.id_session}"
         assert str(partie) == expected
     
     def test_partie_carte_choisie(self):
-        """Test le choix de carte"""
+        """!
+        @brief Vérifie que le choix de carte et l'état de vote sont bien persistés.
+        """
         session = SessionFactory()
         partie = PartieFactory(id_session=session, carte_choisie='8')
         assert partie.carte_choisie == '8'
@@ -93,7 +138,9 @@ class TestPartie:
         assert partie.carte_choisie == '8'
     
     def test_multiple_parties_same_session(self):
-        """Test plusieurs joueurs dans une même session"""
+        """!
+        @brief Vérifie qu'une session peut contenir plusieurs joueurs différents.
+        """
         session = SessionFactory()
         partie1 = PartieFactory(username='Alice', id_session=session)
         partie2 = PartieFactory(username='Bob', id_session=session)
@@ -103,7 +150,11 @@ class TestPartie:
         assert parties.count() == 3
     
     def test_unique_together_constraint(self):
-        """Test la contrainte unique (username, id_session)"""
+        """!
+        @brief Vérifie la contrainte d'unicité `(username, id_session)`.
+        
+        Il doit être impossible de créer deux fois le même joueur dans la même session.
+        """
         session = SessionFactory()
         partie1 = PartieFactory(username='Alice', id_session=session)
         
@@ -117,7 +168,11 @@ class TestPartie:
             )
     
     def test_partie_cascade_delete(self):
-        """Test la suppression en cascade quand la session est supprimée"""
+        """!
+        @brief Vérifie la suppression en cascade (`on_delete=models.CASCADE`).
+        
+        Si une session est supprimée, tous les joueurs associés doivent l'être aussi.
+        """
         session = SessionFactory()
         partie1 = PartieFactory(id_session=session)
         partie2 = PartieFactory(id_session=session)
@@ -131,7 +186,9 @@ class TestPartie:
         assert Partie.objects.filter(id_session_id=session.id_session).count() == 0
     
     def test_partie_possible_cartes(self):
-        """Test les différentes valeurs de cartes possibles"""
+        """!
+        @brief Vérifie que le champ `carte_choisie` accepte différentes valeurs.
+        """
         session = SessionFactory()
         cartes = ['1', '2', '3', '5', '8', '13', '20']
         

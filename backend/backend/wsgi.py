@@ -1,10 +1,8 @@
-"""
-WSGI config for backend project.
+"""!
+@brief Point d'entrée WSGI pour les serveurs web compatibles (Gunicorn, Apache).
 
-It exposes the WSGI callable as a module-level variable named ``application``.
-
-For more information on this file, see
-https://docs.djangoproject.com/en/5.2/howto/deployment/wsgi/
+Expose l'application Django callable nommée `application` pour le déploiement en production
+dans un environnement synchrone standard.
 """
 
 import os
