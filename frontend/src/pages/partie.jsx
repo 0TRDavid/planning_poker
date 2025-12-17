@@ -16,7 +16,6 @@ import VotingDeck from '../components/partie/VotingDeck';
 export default function GameSession() {
     const { id_session } = useParams(); // Récupération de l'ID de session depuis l'URL
     const navigate = useNavigate(); // Hook pour la redirection
-    //const location = useLocation(); 
     
     // Récupération user/mode
     const queryParams = new URLSearchParams(location.search);

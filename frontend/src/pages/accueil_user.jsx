@@ -46,12 +46,7 @@ export default function AccueilUser() {
 // Renvoi vers la page de création de session
   const handleCreate = async () => {
     setCreating(true);
-    try {
-        window.location.href = '/create-session';
-    } catch (e) {
-        console.error("Erreur lors de la création de session:", e);
-        alert("Erreur lors de la création.");
-    }
+    window.location.href = '/create-session';
   };
 
   // Appel l'API pour envoyer le code session et le username puis redirige vers la page partie
