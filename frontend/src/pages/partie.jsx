@@ -1,6 +1,6 @@
 // src/pages/partie.jsx
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useParams, useLocation, useNavigate, data } from 'react-router-dom'; // AJOUT useNavigate
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useParams, useNavigate } from 'react-router-dom'; // AJOUT useNavigate
 import { Container, Stack, Box, Typography, Chip, Divider } from '@mui/material';
 
 // Imports Logic & Services
@@ -58,7 +58,7 @@ export default function GameSession() {
 
 
 
-    const refreshGameState = async () => {
+    const refreshGameState = useCallback(async () => {
         if (!id_session) return;
         try {
             // Récupérer les votes actuels
@@ -83,17 +83,12 @@ export default function GameSession() {
         closeStory(id_session, storyIndex); // Le back fait le calcul des valeurs finales
         // avec le mode de jeu défini !
         storyClosedRef.current = storyIndex +1;
-    }
-
-    }
-
-
-        
+    }}
         } catch (error) {
             console.error("Erreur polling:", error);
         }
 
-    };
+    }, [id_session, username, storyIndex]);
 
     // --- GESTION DU BOUTON SUIVANT ---
     const handleNextStory = async () => {
@@ -121,7 +116,7 @@ export default function GameSession() {
         fetchSessionData(); // charge les données initiales 1 fois
         const intervalId = setInterval(refreshGameState, 2000); // polling toutes les 2s
         return () => clearInterval(intervalId); // cleanup au démontage
-    }, [fetchSessionData]);
+    }, [fetchSessionData, refreshGameState]);
 
     // Handlers
     const handleCardClick = async (value) => {
