@@ -6,7 +6,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import SkipNextIcon from '@mui/icons-material/SkipNext';
 
 // AJOUT DE LA PROP 'onNext'
-export default function StoryDisplay({ currentStory, showVotes, onReveal, onNext }) {
+export default function StoryDisplay({ currentStory, showVotes, onNext }) {
     return (
         <Card variant="outlined" sx={{ minHeight: '200px', p: 3, textAlign: 'center', background: '#f8f8ff' }}>
             <CardContent>

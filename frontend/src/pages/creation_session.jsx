@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { Container, Typography, Stack, Button, Card, CardContent, Divider, FormControl, RadioGroup, FormControlLabel, Radio, Alert, TextField} from '@mui/material';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import SendIcon from '@mui/icons-material/Send';
@@ -66,7 +66,8 @@ export default function ModeSelection() {
                 console.log("Fichier JSON chargé:", jsonContent);
                 setFileData(jsonContent);
                 setError('');
-            } catch (err) {
+            } catch (error) {
+                console.error("Erreur de parsing JSON:", error);
                 setError("Erreur lors de la lecture du fichier JSON. Assurez-vous qu'il est valide.");
                 setFileData(null);
             }

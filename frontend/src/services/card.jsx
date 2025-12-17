@@ -14,7 +14,7 @@ import CardCoffee from '../assets/cartes/cartes_cafe.svg?react';
 import CardInterro from '../assets/cartes/cartes_interro.svg?react';
 
 // Retourne l'ensemble des cartes en fonction du mode de jeu
-export const getCardSet = (mode) => {
+export const getCardSet = () => {
     const FIBONACCI_SET = ['0', '1', '2', '3', '5', '8', '13', '20', '40', '100'];
     const SPECIAL_CARDS = ['coffee', '?'];
     
