@@ -4,7 +4,6 @@ import Nav from "react-bootstrap/Nav";
 import "../assets/header.css"; 
 
 function Header() {
-  const [sidebarOpen] = useState(false);
   const [isFrench, setIsFrench] = useState(true); // État pour gérer la langue
 
   useEffect(() => {

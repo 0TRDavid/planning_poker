@@ -3,10 +3,8 @@ import {Box, Container, Typography, Stack, Button, TextField, Card, CardContent,
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddIcon from '@mui/icons-material/Add';
 import RefreshIcon from '@mui/icons-material/Refresh';
-
-// Importation des fonctions API
 import { fetchSessions, joinPartie } from '../services/api';
-// --- STYLES (Utilisation de l'approche SX de MUI pour la cohésion) ---
+
 const componentStyles = {
     refreshButton: {
         display: { xs: 'none', sm: 'inline-flex' }
@@ -51,6 +49,7 @@ export default function AccueilUser() {
     try {
         window.location.href = '/create-session';
     } catch (e) {
+        console.error("Erreur lors de la création de session:", e);
         alert("Erreur lors de la création.");
     }
   };
