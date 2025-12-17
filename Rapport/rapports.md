@@ -5,16 +5,14 @@
 
 ---
 
-
-
-## 1 - Choix techniques
+## Choix techniques
 
 ### Architecture : Client-Serveur
 
 Nous avons opté pour une architecture Frontend x Backend qui sont deux projets distincts communiquant via HTTP : 
 
 * **Séparation claire des responsabilités :** Le Frontend ne s'occupe que de l'affichage et de l'interaction, tandis que le Backend gère uniquement la logique et les données. Cela rend le code plus propre et plus facile à maintenir.
-* **Travail en parallèle :** Cette séparation nous a permis de développer simultanément les deux parties du projet sans nous bloquer mutuellement, en suivant simplement le plan de l'API.
+* **Travail en parallèle :** Cette séparation permet de développer simultanément les deux parties du projet sans nous bloquer mutuellement, en suivant simplement le plan de l'API.
 
 ### Backend : Django & Django REST Framework
 
@@ -41,7 +39,18 @@ Pour la mise à jour des votes des autres joueurs :
 * **Choix :** Nous avons implémenté un système de **Polling** (le client (Front) interroge le serveur (Back) toutes les 2 secondes).
 * **Justification :** Bien que les WebSockets soient plus performants, le polling est beaucoup plus simple à mettre en œuvre et à tester pour une application de cette échelle.
 
+---
+
 ## 2 - Modélisation
+
+2 tables :
+
+- planning_poker_session : enregistre toutes les parties, les états des parties et les résultats
+- planning_poker_partie : enregistre temporairement toutes les votes des personnes liée à la partie
+
+  shéma à rajouter + explication plus étoffé du fonctionnement
+
+---
 
 ## 3 - Intégration continue (CI/CD)
 
@@ -75,7 +84,43 @@ Ce job ne se lance que si les tests Backend et le Build Frontend ont réussi.
 2. Génération de la documentation technique à partir des commentaires du code (`doxygen Doxyfile`).
 3. Déploiement automatique du site : [Doc Backend](https://0trdavid.github.io/planning_poker/)
 
-## 4 - Documentation du code
+---
+
+## Test & Qualité
+
+La fiabilité de l'application repose sur une suite de tests automatisés.
+
+### Backend (Python/Django)
+
+Les tests backend sont réalisés avec **Pytest**, privilégié pour sa syntaxe et ses fonctionnalités. Nous utilisons également **Factory Boy** pour générer des données de test réalistes.
+
+#### Architecture des tests
+
+Le dossier `backend/tests/` est structuré pour isoler chaque couche de l'application :
+
+* **Tests Unitaires (Models & Logic) :**
+
+  * Vérification des algorithmes de calcul des votes (Moyenne, Médiane, Majorité).
+  * Validation des règles métier (ex: unicité des IDs de session, format du JSON des stories).
+  * Traitement des cas limites (égalité des votes, valeurs non-numériques).
+* **Tests d'Intégration (API & Views) :**
+
+  * Simulation de requêtes HTTP via `APIClient` de DRF.
+  * Vérification des codes de retour HTTP (201 Created, 404 Not Found, etc.).
+  * Scénarios complets : Création de session -> Ajout de joueurs -> Vote -> Révélation.
+
+#### Commandes
+
+```bash
+cd backend
+
+# Lancer tous les tests
+pytest
+```
+
+---
+
+## Documentation du code
 
 La documentation est écrite directement dans les fichiers sources, ce qui garantit qu'elle reste à jour avec le code.
 
