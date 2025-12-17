@@ -17,7 +17,7 @@ COPY . .
 RUN npm run build
 
 # Exposer le port 5171
-EXPOSE 5171
+EXPOSE 5173
 
 # Lancer le serveur Vite Preview sur le port 5171
-CMD ["npx", "vite", "preview", "--port", "5171", "--host"]
+CMD ["npx", "vite", "preview", "--port", "5173", "--host"]

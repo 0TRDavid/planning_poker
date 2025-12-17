@@ -26,17 +26,15 @@ export const fetchSessions = async () => {
  
 
 export const joinPartie = async (id_session, username) => {
-  
-          const res = await fetch('/api/parties/join_partie/', {
-            method: 'POST',
-            
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id_session, username}),
-          });
-          if (!res.ok) throw new Error('Failed to join');
-          res
-          return res.json().catch(() => null);
-        };
+  const res = await fetch(`${API_BASE_URL}/parties/join_partie/`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id_session, username}),
+  });
+  if (!res.ok) throw new Error('Failed to join');
+  return res.json().catch(() => null);
+};
+
 /**
  * Crée une nouvelle session via l'API Django et envoie le tableau de stories.
  * @param {string} titre - Le titre de la nouvelle session.
@@ -154,7 +152,7 @@ export const finPartie = async (id_session, username) => {
     if (!finishRes.ok) throw new Error('Erreur fin partie');
     const finishData = await finishRes.json();
 
-    const deleteRes = await fetch('/api/parties/fin_partie/', {
+    const deleteRes = await fetch(`${API_BASE_URL}/parties/fin_partie/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_session, username }),
@@ -171,7 +169,7 @@ export const finPartie = async (id_session, username) => {
 
 export const voteCard = async (id_session, username, carte_choisie) => {
   try {
-    const response = await fetch('/api/parties/vote_card/', {
+    const response = await fetch(`${API_BASE_URL}/parties/vote_card/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_session, username, carte_choisie }),
@@ -186,7 +184,7 @@ export const voteCard = async (id_session, username, carte_choisie) => {
 
 export const razVote = async (id_session, username) => {
   try {
-    const response = await fetch('/api/parties/raz_vote/', {
+    const response = await fetch(`${API_BASE_URL}/parties/raz_vote/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id_session, username }),

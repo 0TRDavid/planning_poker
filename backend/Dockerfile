@@ -22,4 +22,4 @@ RUN python manage.py collectstatic --noinput
 
 # Exposer le port HTTPS
 EXPOSE 8001
-CMD ["gunicorn", "-b", "0.0.0.0:8001", "backend.wsgi:application"]
+CMD ["gunicorn", "-b", "0.0.0.0:8000", "backend.wsgi:application"]

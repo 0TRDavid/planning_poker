@@ -4,7 +4,7 @@ services:
     container_name: django_dash
     restart: always
     ports:
-      - "8001:8001"
+      - "8000:8000"
     env_file:
       - ./backend/.env
 
@@ -14,9 +14,10 @@ services:
     container_name: react_dash
     restart: always
     ports:
-      - "5171:5171"
-    env_file:
-      - ./frontend/.env
+      - "5173:5173"
+    environment:
+      - VITE_API_BASE_URL=http://backend:8000/api
+      - VITE_DEV_PORT=5173
     depends_on:
       - backend
 
