@@ -5,10 +5,21 @@ from tests.factories import SessionFactory, PartieFactory
 
 
 class TestSessionSerializer:
-    """Tests pour SessionSerializer"""
+    """!
+    @brief Tests unitaires pour le sérialiseur `SessionSerializer`.
+    
+    Vérifie que les objets Session sont correctement convertis en JSON et que
+    les données entrantes (pour créer une session) sont bien validées.
+    """
+
     @pytest.mark.django_db
     def test_serialize_session(self):
-        """Test la sérialisation d'une session"""
+        """!
+        @brief Vérifie la sérialisation (Objet -> JSON).
+        
+        S'assure que le JSON généré contient bien tous les champs attendus
+        ('id_session', 'titre', 'stories', etc.).
+        """
         session = SessionFactory()
         serializer = SessionSerializer(session)
         assert 'id_session' in serializer.data
@@ -19,7 +30,11 @@ class TestSessionSerializer:
     
     @pytest.mark.django_db
     def test_deserialize_session_valid(self):
-        """Test la désérialisation valide"""
+        """!
+        @brief Vérifie la désérialisation valide (JSON -> Objet).
+        
+        Le sérialiseur doit accepter un dictionnaire complet et valide.
+        """
         data = {
             'titre': 'Nouvelle session',
             'stories': {'story1': 'Feature A'},
@@ -31,7 +46,12 @@ class TestSessionSerializer:
 
     @pytest.mark.django_db
     def test_deserialize_session_invalid(self):
-        """Test la désérialisation invalide"""
+        """!
+        @brief Vérifie le rejet de données invalides.
+        
+        Le sérialiseur doit refuser les données s'il manque des champs obligatoires
+        (comme 'stories' ou 'mode_de_jeu').
+        """
         data = {
             'titre': 'Nouvelle session'
             # Manque mode_de_jeu, stories, etc.
@@ -41,11 +61,17 @@ class TestSessionSerializer:
 
 
 class TestPartieSerializer:
-    """Tests pour PartieSerializer"""
-    @pytest.mark.django_db
+    """!
+    @brief Tests unitaires pour le sérialiseur `PartieSerializer`.
     
+    Vérifie la gestion des données des joueurs (sérialisation et validation).
+    """
+
+    @pytest.mark.django_db
     def test_serialize_partie(self):
-        """Test la sérialisation d'une partie"""
+        """!
+        @brief Vérifie la sérialisation d'un joueur (Objet -> JSON).
+        """
         partie = PartieFactory()
         serializer = PartieSerializer(partie)
         assert 'username' in serializer.data
@@ -55,7 +81,11 @@ class TestPartieSerializer:
 
     @pytest.mark.django_db
     def test_deserialize_partie_valid(self):
-        """Test la désérialisation valide"""
+        """!
+        @brief Vérifie la désérialisation valide pour un joueur.
+        
+        Doit réussir si tous les champs requis (dont la clé étrangère id_session) sont présents.
+        """
         session = SessionFactory()
         data = {
             'username': 'Alice',
@@ -68,7 +98,11 @@ class TestPartieSerializer:
 
     @pytest.mark.django_db
     def test_deserialize_partie_invalid(self):
-        """Test la désérialisation invalide"""
+        """!
+        @brief Vérifie le rejet d'un joueur mal formé.
+        
+        Doit échouer si l'ID de session est manquant.
+        """
         data = {
             'username': 'Alice'
             # Manque id_session, etc.

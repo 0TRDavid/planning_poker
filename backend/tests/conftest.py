@@ -1,11 +1,15 @@
-# tests/conftest.py
+"""!
+@brief Configuration globale des tests pytest pour le projet.
+
+Ce fichier est automatiquement détecté par pytest. Il est responsable de :
+- Configurer l'environnement Django avant le lancement des tests.
+- Définir des "fixtures" globales (objets réutilisables) accessibles par tous les fichiers de test.
+"""
+
 import os
 import django
 import pytest
 from django.conf import settings
-
-# Ce fichier configure l'environnement de test Django et définit des fixtures globales. 
-# Les fixtures sont utilisées pour fournir des clients de test réutilisables dans plusieurs fichiers de test.
 
 # Configure Django AVANT les imports
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
@@ -19,11 +23,25 @@ from rest_framework.test import APIClient
 
 @pytest.fixture
 def api_client():
-    """Client API REST pour les tests"""
+    """!
+    @brief Fournit un client API REST Framework pour les tests.
+    
+    Cette fixture permet de simuler des requêtes HTTP (GET, POST, etc.) vers l'API
+    sans avoir besoin de lancer un serveur réel. Elle gère nativement le format JSON.
+    
+    @return Une instance de `rest_framework.test.APIClient`.
+    """
     return APIClient()
 
 
 @pytest.fixture
 def client():
-    """Client Django standard"""
+    """!
+    @brief Fournit un client Django standard pour les tests.
+    
+    Utilisé pour tester les vues Django classiques (non-API) ou pour des besoins
+    spécifiques ne nécessitant pas les fonctionnalités de DRF.
+    
+    @return Une instance de `django.test.Client`.
+    """
     return Client()
