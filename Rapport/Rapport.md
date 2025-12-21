@@ -3,8 +3,6 @@
 **Auteurs :** Nicolas MENY & David TRUONG
 **Dépôt GitHub :** https://github.com/0TRDavid/planning_poker
 
----
-
 ## Choix techniques
 
 ### Architecture : Client-Serveur
@@ -43,8 +41,6 @@ Pour la mise à jour des votes des autres joueurs :
 * **Choix :** Nous avons implémenté un système de **Polling** (le client (Front) interroge le serveur (Back) toutes les 2 secondes).
 * **Justification :** Bien que les WebSockets soient plus performants, le polling est beaucoup plus simple à mettre en œuvre et à tester pour une application de cette échelle.
 
----
-
 ## 2 - Modélisation
 
 2 tables :
@@ -62,9 +58,6 @@ Les différentes API permettent au front d'interagir avec les tables et le back 
 Diagramme des APIs :
 
 ![Architecture des APIs](api_architecture.png)
-
-
----
 
 ## 3 - Intégration continue (CI/CD)
 
@@ -101,8 +94,6 @@ Ce job ne se lance que si les tests Backend et le Build Frontend ont réussi.
 2. Génération de la documentation technique à partir des commentaires du code (`doxygen Doxyfile`).
 3. Déploiement automatique du site : [Doc Backend](https://0trdavid.github.io/planning_poker/)
 
----
-
 ## Test & Qualité
 
 La fiabilité de l'application repose sur une suite de tests automatisés.
@@ -134,8 +125,6 @@ cd backend
 # Lancer tous les tests
 pytest
 ```
-
----
 
 ## Documentation du code
 

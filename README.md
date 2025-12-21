@@ -10,10 +10,6 @@
 
 **Application collaborative d'estimation de tâches pour les équipes Scrum.**
 
----
-
-
-
 ## Présentation
 
 Le projet **Planning Poker** est une application web collaborative destinée aux équipes agiles pour estimer la complexité des tâches (User Stories).
@@ -27,8 +23,6 @@ L'application permet de :
 * **Calculer** automatiquement le résultat final (Moyenne, Médiane, Majorité) une fois les votes révélés.
 
 L'objectif est de **fournir une solution robuste, testée et documentée**, reposant sur une architecture moderne séparant clairement l'interface utilisateur de la logique métier.
-
----
 
 ## Stack Technique
 
@@ -52,8 +46,6 @@ L'objectif est de **fournir une solution robuste, testée et documentée**, repo
 * **Conteneurisation :** Docker & Docker Compose
 * **CI/CD :** GitHub Actions (Tests auto + Déploiement Doc)
 
----
-
 ## Pré-requis
 
 Avant de commencer, assurez-vous d'avoir installé :
@@ -61,8 +53,6 @@ Avant de commencer, assurez-vous d'avoir installé :
 * **Python :** Version 3.12 ou supérieure.
 * **Node.js :** Version 22 ou supérieure.
 * **Docker Desktop :** Installé et lancé (pour le déploiement conteneurisé).
-
----
 
 ## Méthode 1 : Développement local
 
